@@ -3,91 +3,123 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JunaWeb</title>
-  <!-- Enlace al archivo CSS externo -->
-  <link rel="stylesheet" href="static/css/style.css">
+  <title>JunaWeb - Innovación en el Comedor Escolar</title>
+  <link rel="stylesheet" href="static/css/index.css">
 </head>
 <body>
 
-  <!-- Barra Superior -->
-  <nav class="navbar">
-    <div class="logo">Juna<span>Web</span></div>
-    <a href="#" class="btn">Registrarse</a>
-  </nav>
+  <!-- Encabezado de Navegación -->
+  <header>
+    <a href="index.html" class="logo">Juna<span>Web</span></a>
+    <div class="nav-links">
+      <a href="page/iniciar_sesion.html" class="nav-link">Iniciar Sesión</a>
+      <a href="page/registro.html" class="nav-link">Registrarse</a>
+    </div>
+  </header>
 
-  <!-- Contenedor Principal (Mobile / PC) -->
-  <main class="container">
-    
-    <!-- Columna Texto -->
-    <section class="hero">
-      <span class="badge">• Programa de Alimentación Escolar</span>
-      <h1>El comedor escolar <span>sin filas, sin suplantaciones.</span></h1>
-      <p>JunaWeb digitaliza el comedor escolar con reservas online y control de acceso por código QR.</p>
-      <a href="#" class="btn">Reservar mi almuerzo →</a>
-    </section>
+  <!-- Sección Principal (Hero) -->
+  <section class="hero">
+    <span class="badge">• Programa de Alimentación Escolar PAE - JUNAEB</span>
+    <h1>El comedor escolar <span>sin filas</span> y <span>sin suplantaciones</span>.</h1>
+    <p>
+      JunaWeb digitaliza la gestión del comedor mediante un sistema interactivo de reservas en línea 
+      y un innovador punto de control autónomo con trípode y validación por código QR.
+    </p>
+    <!-- Botón directo hacia el inicio / login -->
+    <a href="page/inicio.html" class="cta-button">Ir al Inicio / Reservar Mi Almuerzo →</a>
+  </section>
 
-    <!-- Columna Tarjeta -->
-    <section class="card">
-      <div class="user-header">
-        <div>
-          <span class="label">Estudiante</span>
-          <h3>Valentina Morales</h3>
-        </div>
-        <div class="avatar">VM</div>
+  <!-- Resumen y Funcionamiento -->
+  <section class="container">
+    <h2 class="section-title">Arquitectura y <span>Funcionamiento</span></h2>
+    <div class="grid-3">
+      <div class="card">
+        <h3>1. Reserva Digital</h3>
+        <p>El estudiante o funcionario ingresa a la plataforma web y confirma su asistencia. El sistema genera automáticamente un código QR único asociado a su perfil.</p>
       </div>
-      
-      <div class="qr-box">
-        <img class="qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=JunaWeb-Valentina" alt="Código QR">
-        <span class="qr-label">Código QR único</span>
+      <div class="card">
+        <h3>2. Estación Trípode</h3>
+        <p>En la entrada del comedor se instala un dispositivo fijo sobre un trípode. Funciona como lector autónomo liberando las manos del inspector o encargado.</p>
       </div>
-
-      <div class="details">
-        <div class="row">
-          <span>Fecha</span>
-          <strong>Jueves 24 jul 2026</strong>
-        </div>
-        <div class="row">
-          <span>Turno</span>
-          <strong>12:15 — 13:00</strong>
-        </div>
-        <div class="row">
-          <span>Estado</span>
-          <strong class="status-active">● Reservado</strong>
-        </div>
-      </div>
-
-      <div class="status-banner">
-        <span>✓ Acceso Permitido</span>
-        <small>12:17 — Puerta Principal</small>
-      </div>
-    </section>
-
-  </main>
-<section class="stats-section">
-    <div class="container stats-container">
-      <div class="stat-item">
-        <span class="stat-number">90%</span>
-        <span class="stat-label">Reducción en tiempos de espera</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number">0</span>
-        <span class="stat-label">Casos de suplantación</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number">100%</span>
-        <span class="stat-label">Cobertura de reservas digitales</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number">3 seg</span>
-        <span class="stat-label">Tiempo promedio de escaneo</span>
+      <div class="card">
+        <h3>3. Validación Dinámica</h3>
+        <p>Al escanear el QR, la pantalla muestra: <strong>"Acceso Permitido"</strong> junto con la fecha, hora exacta y nombre del usuario para prevenir capturas de pantalla y suplantaciones.</p>
       </div>
     </div>
   </section>
 
-  <!-- SECCIÓN: PROCESO SIMPLIFICADO -->
-  <section class="container process-section">
-    <span class="section-tag">PROCESO SIMPLIFICADO</span>
-    <h2>De la reserva al almuerzo en 4 pasos</h2>
+  <!-- Matriz Operacional -->
+  <section class="container">
+    <h2 class="section-title">Matriz <span>Operacional</span></h2>
+
+    <div class="matrix-card">
+      <h4>Problema: Lentitud en la validación manual por inspectores</h4>
+      <div class="matrix-details">
+        <div><strong>Solución:</strong> Escáner fijo en trípode de autoservicio.</div>
+        <div><strong>Impacto Directo:</strong> Agilización extrema de la fila; el encargado solo verifica la pantalla.</div>
+      </div>
+    </div>
+
+    <div class="matrix-card">
+      <h4>Problema: Alumnos se cuelan, discuten o repiten plato</h4>
+      <div class="matrix-details">
+        <div><strong>Solución:</strong> Validación transparente en pantalla con datos en tiempo real.</div>
+        <div><strong>Impacto Directo:</strong> Control tecnológico objetivo que erradica la suplantación.</div>
+      </div>
+    </div>
+
+    <div class="matrix-card">
+      <h4>Problema: Desperdicio de raciones por inasistencia no informada</h4>
+      <div class="matrix-details">
+        <div><strong>Solución:</strong> Reserva previa cruzada con el acceso en el casino.</div>
+        <div><strong>Impacto Directo:</strong> Sustentabilidad operativa y estadísticas de consumo real.</div>
+      </div>
+    </div>
   </section>
+
+  <!-- Estadísticas Impacto Global -->
+  <section class="container">
+    <h2 class="section-title">Por qué es <span>Necesario</span></h2>
+    <div class="grid-3">
+      <div class="stat-box">
+        <div class="stat-number">1.050M</div>
+        <p>De toneladas de comida se desperdician al año a nivel mundial.</p>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">19%</div>
+        <p>Del total de alimentos disponibles para consumo humano se termina descartando.</p>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">10%</div>
+        <p>De las emisiones mundiales de gases de efecto invernadero provienen de este desperdicio.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Alineación con ODS -->
+  <section class="container">
+    <h2 class="section-title">Compromiso con los <span>ODS</span></h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>ODS 12: Producción y Consumo Responsables</h3>
+        <p>Garantiza que el flujo sea lo suficientemente rápido para que todos alcancen a almorzar dentro del tiempo del recreo, evitando botar raciones sobrantes por el toque del timbre.</p>
+      </div>
+      <div class="card">
+        <h3>ODS 2: Hambre Cero</h3>
+        <p>El registro de hora, fecha y nombre asegura un reparto 100% equitativo y transparente, garantizando la ración al estudiante que realmente reservó su cupo.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Botón Final de Acción -->
+  <section class="container" style="text-align: center; margin-bottom: 40px;">
+    <h2 style="margin-bottom: 20px;">¿Listo para gestionar tu almuerzo?</h2>
+    <a href="login.html" class="cta-button">Ingresar al Sistema →</a>
+  </section>
+
+  <footer>
+    <p>Proyecto JunaWeb - Optimización del Programa de Alimentación Escolar (PAE)</p>
+  </footer>
+
 </body>
 </html>
