@@ -1,133 +1,152 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JunaWeb - Innovación en el Comedor Escolar</title>
-  <link rel="stylesheet" href="static/css/index.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión PAE - Comedor Escolar</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="static/css/style.css">
+    <style>
+        /* Pequeño ajuste para el enlace de ingresar */
+        .link-ingresar {
+            color: var(--text-main);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-weight: 500;
+        }
+        .link-ingresar:hover {
+            color: var(--accent-color);
+        }
+        /* Ajuste para el botón de registro en el navbar */
+        .btn-nav-register {
+            border-radius: 20px;
+            padding: 8px 20px;
+        }
+    </style>
 </head>
-
 <body>
 
-  <header>
-    <a href="index.html" class="logo">Juna<span>Web</span></a>
-    <div class="nav-links">
-      <a href="page/iniciar_sesion.html" class="nav-link">Iniciar Sesión</a>
-      <a href="page/registro.html" class="nav-link">Registrarse</a>
-    </div>
-  </header>
+    <!-- Navbar / App Header -->
+    <nav class="navbar navbar-dark custom-navbar mb-4">
+        <div class="container d-flex flex-wrap align-items-center justify-content-between">
+            
+            <!-- Logo -->
+            <a class="navbar-brand d-flex align-items-center mb-2 mb-lg-0" href="index.html">
+                <span class="logo-icon me-2"></span>
+                <strong>PAE<span class="text-accent">Web</span></strong>
+            </a>
+            
+            <!-- Selector de Perfiles -->
+            <ul class="nav nav-pills mb-2 mb-lg-0 mx-auto" id="perfilesTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="alumno-tab" data-bs-toggle="pill" data-bs-target="#alumno" type="button" role="tab">Alumno</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="admin-tab" data-bs-toggle="pill" data-bs-target="#admin" type="button" role="tab">Supervisor</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="dir-tab" data-bs-toggle="pill" data-bs-target="#dir" type="button" role="tab">Dirección</button>
+                </li>
+            </ul>
 
+            <!-- Botones de Inicio de Sesión y Registro -->
+            <div class="d-flex align-items-center">
+                <a href="page/login.html" class="link-ingresar me-4">Ingresar</a>
+                <a href="page/registrarse.html" class="btn btn-accent btn-nav-register">Registrarse</a>
+            </div>
 
-  <section class="hero">
-    <span class="badge">• Programa de Alimentación Escolar PAE - JUNAEB</span>
-    <h1>El comedor escolar <span>sin filas</span> y <span>sin suplantaciones</span>.</h1>
-    <p>
-      JunaWeb digitaliza la gestión del comedor mediante un sistema interactivo de reservas en línea
-      y un innovador punto de control autónomo con trípode y validación por código QR.
-    </p>
-
-    <a href="page/inicio.html" class="cta-button">Ir al Inicio / Reservar Mi Almuerzo →</a>
-  </section>
-
-
-  <section class="container">
-    <h2 class="section-title">Arquitectura y <span>Funcionamiento</span></h2>
-    <div class="grid-3">
-      <div class="card">
-        <h3>1. Reserva Digital</h3>
-        <p>El estudiante o funcionario ingresa a la plataforma web y confirma su asistencia. El sistema genera
-          automáticamente un código QR único asociado a su perfil.</p>
-      </div>
-      <div class="card">
-        <h3>2. Estación Trípode</h3>
-        <p>En la entrada del comedor se instala un dispositivo fijo sobre un trípode. Funciona como lector autónomo
-          liberando las manos del inspector o encargado.</p>
-      </div>
-      <div class="card">
-        <h3>3. Validación Dinámica</h3>
-        <p>Al escanear el QR, la pantalla muestra: <strong>"Acceso Permitido"</strong> junto con la fecha, hora exacta y
-          nombre del usuario para prevenir capturas de pantalla y suplantaciones.</p>
-      </div>
-    </div>
-  </section>
-
-
-  <section class="container">
-    <h2 class="section-title">Matriz <span>Operacional</span></h2>
-
-    <div class="matrix-card">
-      <h4>Problema: Lentitud en la validación manual por inspectores</h4>
-      <div class="matrix-details">
-        <div><strong>Solución:</strong> Escáner fijo en trípode de autoservicio.</div>
-        <div><strong>Impacto Directo:</strong> Agilización extrema de la fila; el encargado solo verifica la pantalla.
         </div>
-      </div>
-    </div>
+    </nav>
 
-    <div class="matrix-card">
-      <h4>Problema: Alumnos se cuelan, discuten o repiten plato</h4>
-      <div class="matrix-details">
-        <div><strong>Solución:</strong> Validación transparente en pantalla con datos en tiempo real.</div>
-        <div><strong>Impacto Directo:</strong> Control tecnológico objetivo que erradica la suplantación.</div>
-      </div>
-    </div>
+    <!-- Main App Container -->
+    <main class="container">
+        <div class="tab-content" id="perfilesTabContent">
+            
+            <!-- PERFIL: ALUMNO -->
+            <div class="tab-pane fade show active" id="alumno" role="tabpanel">
+                <div class="row align-items-center min-vh-75">
+                    <!-- Text Area -->
+                    <div class="col-lg-6 mb-5 mb-lg-0">
+                        <span class="badge badge-accent mb-3">Minuta del Día</span>
+                        <h1 class="display-4 fw-bold mb-4">Asegura tu <span class="text-accent">almuerzo</span> hoy.</h1>
+                        <p class="lead text-muted mb-4">Menú: Pollo al horno con puré de papas y ensalada. Fruta de postre.</p>
+                        <button class="btn btn-accent btn-lg" onclick="generarQR()">Confirmar Asistencia ➔</button>
+                    </div>
+                    <!-- App Card Area -->
+                    <div class="col-lg-5 offset-lg-1">
+                        <div class="app-card p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <small class="text-muted d-block">Estudiante</small>
+                                    <strong class="fs-5">Juan Pérez</strong>
+                                </div>
+                                <div class="avatar">JP</div>
+                            </div>
+                            
+                            <div class="qr-container text-center py-5 mb-4" id="qrContainer">
+                                <p class="text-muted mb-0">Confirma para generar QR</p>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between border-top border-dark pt-3">
+                                <small class="text-muted">Estado</small>
+                                <small class="text-accent fw-bold" id="estadoAlumno">• Pendiente</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <div class="matrix-card">
-      <h4>Problema: Desperdicio de raciones por inasistencia no informada</h4>
-      <div class="matrix-details">
-        <div><strong>Solución:</strong> Reserva previa cruzada con el acceso en el casino.</div>
-        <div><strong>Impacto Directo:</strong> Sustentabilidad operativa y estadísticas de consumo real.</div>
-      </div>
-    </div>
-  </section>
+            <!-- PERFIL: ADMINISTRADOR / SUPERVISOR -->
+            <div class="tab-pane fade" id="admin" role="tabpanel">
+                <div class="row justify-content-center">
+                    <div class="col-md-6 text-center">
+                        <h2 class="mb-4">Control de Acceso</h2>
+                        <div class="app-card p-4 mb-4">
+                            <div class="scanner-window mb-4">
+                                <div class="scanner-line"></div>
+                                <p class="mt-5 pt-4 text-muted">Escaneando código...</p>
+                            </div>
+                            <button class="btn btn-outline-light btn-lg w-100 mb-3" onclick="simularEscaneo(true)">Simular Escaneo (Válido)</button>
+                            <button class="btn btn-outline-danger btn-lg w-100" onclick="simularEscaneo(false)">Simular Escaneo (Duplicado)</button>
+                        </div>
+                        <div id="resultadoEscaneo" class="alert d-none" role="alert"></div>
+                    </div>
+                </div>
+            </div>
 
+            <!-- PERFIL: DIRECCIÓN / PAE -->
+            <div class="tab-pane fade" id="dir" role="tabpanel">
+                <h2 class="mb-4">Dashboard PAE <span class="text-muted fs-5">- Corte 10:00 AM</span></h2>
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="app-card p-4 text-center">
+                            <h5 class="text-muted">Raciones Preparadas</h5>
+                            <h1 class="display-3 fw-bold">450</h1>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="app-card p-4 text-center">
+                            <h5 class="text-muted">Asistencias Confirmadas</h5>
+                            <h1 class="display-3 fw-bold text-accent">382</h1>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="app-card p-4 text-center">
+                            <h5 class="text-muted">Mermas Evitadas</h5>
+                            <h1 class="display-3 fw-bold text-success">68</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-  <section class="container">
-    <h2 class="section-title">Por qué es <span>Necesario</span></h2>
-    <div class="grid-3">
-      <div class="stat-box">
-        <div class="stat-number">1.050M</div>
-        <p>De toneladas de comida se desperdician al año a nivel mundial.</p>
-      </div>
-      <div class="stat-box">
-        <div class="stat-number">19%</div>
-        <p>Del total de alimentos disponibles para consumo humano se termina descartando.</p>
-      </div>
-      <div class="stat-box">
-        <div class="stat-number">10%</div>
-        <p>De las emisiones mundiales de gases de efecto invernadero provienen de este desperdicio.</p>
-      </div>
-    </div>
-  </section>
+        </div>
+    </main>
 
-
-  <section class="container">
-    <h2 class="section-title">Compromiso con los <span>ODS</span></h2>
-    <div class="grid-2">
-      <div class="card">
-        <h3>ODS 12: Producción y Consumo Responsables</h3>
-        <p>Garantiza que el flujo sea lo suficientemente rápido para que todos alcancen a almorzar dentro del tiempo del
-          recreo, evitando botar raciones sobrantes por el toque del timbre.</p>
-      </div>
-      <div class="card">
-        <h3>ODS 2: Hambre Cero</h3>
-        <p>El registro de hora, fecha y nombre asegura un reparto 100% equitativo y transparente, garantizando la ración
-          al estudiante que realmente reservó su cupo.</p>
-      </div>
-    </div>
-  </section>
-
-
-  <section class="container" style="text-align: center; margin-bottom: 40px;">
-    <h2 style="margin-bottom: 20px;">¿Listo para gestionar tu almuerzo?</h2>
-    <a href="login.html" class="cta-button">Ingresar al Sistema →</a>
-  </section>
-
-  <footer>
-    <p>Proyecto JunaWeb - Optimización del Programa de Alimentación Escolar (PAE)</p>
-  </footer>
-
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="static/js/script.js"></script>
 </body>
-
 </html>
