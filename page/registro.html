@@ -1,52 +1,85 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JunaWeb - Registro</title>
-  <link rel="stylesheet" href="../static/css/registro.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JunaWeb - Registro de Estudiantes</title>
+        <meta name="author" content="Ariel Faundez, Agustin sanchez, Dante Canales, Diego Valenzuela y Benjamin Carrasco">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/iniciar_sesion.css">
 </head>
-<body>
+<body class="dark-theme d-flex flex-column min-vh-100 justify-content-center align-items-center py-4">
 
-  <header>
-    <a href="../index.html" class="logo">Juna<span>Web</span></a>
-    <a href="iniciar_sesion.html" class="nav-link">Iniciar Sesión</a>
-  </header>
-
-  <main class="auth-container">
-    <div class="auth-card">
-      <h2>Crea tu <span>Cuenta</span></h2>
-      <p class="subtitle">Registrate para gestionar tus reservas de alimentación escolar.</p>
-
-      <form action="#" method="POST">
-        <div class="form-group">
-          <label for="fullname">Nombre Completo</label>
-          <input type="text" id="fullname" placeholder="Ej: Benjamin Carrasco" required>
+    <div class="login-container w-100 px-3" style="max-width: 450px;">
+        <!-- Logo y Cabecera -->
+        <div class="text-center mb-4">
+            <a href="../index.html" class="d-inline-flex align-items-center text-decoration-none mb-2">
+                <img src="../static/images/logo.png" alt="Logo JunaWeb" class="header-logo" style="height: 40px;">
+                <span class="ms-2 fs-3 font-poppins fw-bold">
+                    <span class="text-white">Juna</span><span class="text-accent">Web</span>
+                </span>
+            </a>
+            <h5 class="text-white font-poppins fw-bold mb-1">Registro de Estudiante</h5>
+            <p class="text-bright-sub font-inter xsmall">Crea tu cuenta para reservar tu ración PAE diaria</p>
         </div>
 
-        <div class="form-group">
-          <label for="rut">RUT</label>
-          <input type="text" id="rut" placeholder="12.345.678-9" required>
+        <!-- Tarjeta de Formulario -->
+        <div class="custom-card p-4 shadow-lg border-accent-glow">
+            <div id="registro-alert" class="alert d-none py-2 mb-3 font-inter xsmall text-center"></div>
+
+            <form id="form-registro" onsubmit="procesarRegistro(event)">
+                <!-- Nombre Completo -->
+                <div class="mb-3 text-start">
+                    <label for="registro-nombre" class="form-label text-bright-sub font-inter xsmall fw-bold">Nombre Completo</label>
+                    <input type="text" class="form-control custom-input font-inter" id="registro-nombre" placeholder="Ej: Juan Pérez" required>
+                </div>
+
+                <!-- RUT Con filtro automático de caracteres -->
+                <div class="mb-3 text-start">
+                    <label for="registro-rut" class="form-label text-bright-sub font-inter xsmall fw-bold">RUT (Ej: 20.123.456-K)</label>
+                    <input type="text" class="form-control custom-input font-inter" id="registro-rut" placeholder="Ej: 20.123.456-K" oninput="filtrarRut(this)" maxlength="12" required>
+                </div>
+
+                <!-- Curso -->
+                <div class="mb-3 text-start">
+                    <label for="registro-curso" class="form-label text-bright-sub font-inter xsmall fw-bold">Curso / Nivel</label>
+                    <select class="form-select custom-input font-inter text-white bg-dark" id="registro-curso" required>
+                        <option value="" disabled selected>Selecciona tu curso</option>
+                        <option value="1° Medio A">1° Medio A</option>
+                        <option value="2° Medio A">2° Medio A</option>
+                        <option value="3° Medio A">3° Medio A</option>
+                        <option value="4° Medio A">4° Medio A</option>
+                    </select>
+                </div>
+
+                <!-- Contraseña -->
+<div class="mb-4 text-start">
+    <label for="registro-password" class="form-label text-bright-sub font-inter xsmall fw-bold">Contraseña</label>
+    <input type="password" class="form-control custom-input font-inter" id="registro-password" placeholder="Mínimo 4 números" minlength="4" required>
+    <div class="form-text text-bright-sub xsmall mt-1">Mínimo 4 números o caracteres.</div>
+</div>
+
+                <!-- Botón Submit -->
+                <button type="submit" class="btn btn-custom-primary w-100 py-2 font-poppins fw-bold glow-btn mb-3">
+                    Crear Cuenta y Reservar Ración →
+                </button>
+            </form>
+
+            <div class="text-center font-inter xsmall">
+                <span class="text-bright-sub">¿Ya tienes cuenta?</span>
+                <a href="iniciar_sesion.html" class="text-accent text-decoration-none fw-bold ms-1">Inicia sesión aquí</a>
+            </div>
         </div>
-
-        <div class="form-group">
-          <label for="email">Correo Electrónico</label>
-          <input type="email" id="email" placeholder="estudiante@colegio.cl" required>
-        </div>
-
-        <div class="form-group">
-          <label for="password">Contraseña</label>
-          <input type="password" id="password" placeholder="Crea una contraseña segura" required>
-        </div>
-
-        <button type="submit" class="btn-submit">Crear Cuenta →</button>
-      </form>
-
-      <div class="auth-footer">
-        ¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a>
-      </div>
     </div>
-  </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../static/js/registro.js"></script>
 </body>
 </html>

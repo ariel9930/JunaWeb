@@ -1,133 +1,226 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JunaWeb - Innovación en el Comedor Escolar</title>
-  <link rel="stylesheet" href="static/css/index.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Ariel Faundez, Agustin sanchez, Dante Canales, Diego Valenzuela y Benjamin Carrasco">
+    <title>JunaWeb - Sistema PAE Digital</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/iniciar_sesion.css">
+
+    <!-- Librería del Lector de Código QR con Cámara -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
+<body class="dark-theme d-flex flex-column min-vh-100">
 
-<body>
-
-  <header>
-    <a href="index.html" class="logo">Juna<span>Web</span></a>
-    <div class="nav-links">
-      <a href="page/iniciar_sesion.html" class="nav-link">Iniciar Sesión</a>
-      <a href="page/registro.html" class="nav-link">Registrarse</a>
-    </div>
-  </header>
-
-
-  <section class="hero">
-    <span class="badge">• Programa de Alimentación Escolar PAE - JUNAEB</span>
-    <h1>El comedor escolar <span>sin filas</span> y <span>sin suplantaciones</span>.</h1>
-    <p>
-      JunaWeb digitaliza la gestión del comedor mediante un sistema interactivo de reservas en línea
-      y un innovador punto de control autónomo con trípode y validación por código QR.
-    </p>
-
-    <a href="page/inicio.html" class="cta-button">Ir al Inicio / Reservar Mi Almuerzo →</a>
-  </section>
-
-
-  <section class="container">
-    <h2 class="section-title">Arquitectura y <span>Funcionamiento</span></h2>
-    <div class="grid-3">
-      <div class="card">
-        <h3>1. Reserva Digital</h3>
-        <p>El estudiante o funcionario ingresa a la plataforma web y confirma su asistencia. El sistema genera
-          automáticamente un código QR único asociado a su perfil.</p>
-      </div>
-      <div class="card">
-        <h3>2. Estación Trípode</h3>
-        <p>En la entrada del comedor se instala un dispositivo fijo sobre un trípode. Funciona como lector autónomo
-          liberando las manos del inspector o encargado.</p>
-      </div>
-      <div class="card">
-        <h3>3. Validación Dinámica</h3>
-        <p>Al escanear el QR, la pantalla muestra: <strong>"Acceso Permitido"</strong> junto con la fecha, hora exacta y
-          nombre del usuario para prevenir capturas de pantalla y suplantaciones.</p>
-      </div>
-    </div>
-  </section>
-
-
-  <section class="container">
-    <h2 class="section-title">Matriz <span>Operacional</span></h2>
-
-    <div class="matrix-card">
-      <h4>Problema: Lentitud en la validación manual por inspectores</h4>
-      <div class="matrix-details">
-        <div><strong>Solución:</strong> Escáner fijo en trípode de autoservicio.</div>
-        <div><strong>Impacto Directo:</strong> Agilización extrema de la fila; el encargado solo verifica la pantalla.
+    <header class="p-3 border-bottom border-dark sticky-top glass-header">
+        <div class="container-fluid d-flex justify-content-between align-items-center px-4">
+            <a href="index.html" class="d-flex align-items-center text-decoration-none">
+                <img src="static/images/logo.png" alt="Logo JunaWeb" class="header-logo">
+                <span class="ms-3 fs-4 font-poppins fw-bold">
+                    <span class="text-white">Juna</span><span class="text-accent">Web</span>
+                </span>
+            </a>
+            <div class="d-flex gap-2" id="header-buttons">
+                <a href="page/iniciar_sesion.html" class="btn btn-custom-outline btn-sm">Iniciar Sesión</a>
+                <a href="page/registro.html" class="btn btn-custom-primary btn-sm">Registrarse</a>
+            </div>
         </div>
-      </div>
-    </div>
+    </header>
 
-    <div class="matrix-card">
-      <h4>Problema: Alumnos se cuelan, discuten o repiten plato</h4>
-      <div class="matrix-details">
-        <div><strong>Solución:</strong> Validación transparente en pantalla con datos en tiempo real.</div>
-        <div><strong>Impacto Directo:</strong> Control tecnológico objetivo que erradica la suplantación.</div>
-      </div>
-    </div>
+    <main class="container d-flex flex-grow-1 align-items-center py-5">
+        <div class="row w-100 align-items-center justify-content-between g-5">
+            
+            <!-- Columna Izquierda: Información Principal -->
+            <div class="col-12 col-lg-6">
+                <h1 class="display-4 font-poppins fw-bold text-white mb-3">
+                    El comedor escolar <span class="text-accent">sin filas</span>, sin suplantaciones.
+                </h1>
+                <p class="text-bright-sub font-inter fs-5 mb-4">
+                    JunaWeb digitaliza el Programa de Alimentación Escolar con reservas online y control de acceso por código QR. Más justo, más rápido y completamente automático.
+                </p>
 
-    <div class="matrix-card">
-      <h4>Problema: Desperdicio de raciones por inasistencia no informada</h4>
-      <div class="matrix-details">
-        <div><strong>Solución:</strong> Reserva previa cruzada con el acceso en el casino.</div>
-        <div><strong>Impacto Directo:</strong> Sustentabilidad operativa y estadísticas de consumo real.</div>
-      </div>
-    </div>
-  </section>
+                <!-- Tarjeta de Perfil Resumen (Visible al Iniciar Sesión) -->
+                <div id="perfil-usuario-main" class="custom-card p-3 mb-4 d-none border-accent-glow">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="badge-custom rounded-circle p-2 fs-5" id="main-avatar">--</div>
+                            <div>
+                                <h5 class="text-white font-poppins fw-bold mb-0" id="main-nombre">--</h5>
+                                <span class="text-bright-sub xsmall">
+                                    RUT: <strong id="main-rut" class="text-white">--</strong> | 
+                                    Cargo: <strong id="main-curso" class="text-white">--</strong>
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="badge bg-success font-inter mb-1 d-block" id="main-rol">--</span>
+                            <button onclick="cerrarSesion()" class="btn btn-sm btn-outline-danger">Cerrar Sesión</button>
+                        </div>
+                    </div>
+                </div>
 
+                <button type="button" onclick="intentarReservar()" class="btn btn-custom-primary btn-lg py-3 px-4 font-poppins fw-bold glow-btn">
+                    Reservar mi almuerzo →
+                </button>
 
-  <section class="container">
-    <h2 class="section-title">Por qué es <span>Necesario</span></h2>
-    <div class="grid-3">
-      <div class="stat-box">
-        <div class="stat-number">1.050M</div>
-        <p>De toneladas de comida se desperdician al año a nivel mundial.</p>
-      </div>
-      <div class="stat-box">
-        <div class="stat-number">19%</div>
-        <p>Del total de alimentos disponibles para consumo humano se termina descartando.</p>
-      </div>
-      <div class="stat-box">
-        <div class="stat-number">10%</div>
-        <p>De las emisiones mundiales de gases de efecto invernadero provienen de este desperdicio.</p>
-      </div>
-    </div>
-  </section>
+                <div id="alerta-reserva" class="alert alert-warning mt-3 font-inter small d-none text-center rounded-3" role="alert">
+                     <strong>¡Atención!</strong> Debes iniciar sesión con tu RUT para poder reservar un almuerzo.
+                </div>
+            </div>
 
+            <!-- Columna Derecha: Vista Previa, Pase QR, Lector Cámara o Vista Cocina -->
+            <div class="col-12 col-lg-5">
+                
+                <!-- 1. VISTA PREVIA (Visitantes) -->
+                <div id="preview-visita" class="custom-card p-4 text-center card-hover shadow-lg">
+                    <div class="py-2">
+                        <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#00d27a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-3" style="filter: drop-shadow(0 0 15px rgba(0, 210, 122, 0.4));">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                            <line x1="7" y1="7" x2="7" y2="7.01"></line>
+                            <line x1="18" y1="7" x2="18" y2="7.01"></line>
+                            <line x1="7" y1="18" x2="7" y2="18.01"></line>
+                        </svg>
+                    </div>
 
-  <section class="container">
-    <h2 class="section-title">Compromiso con los <span>ODS</span></h2>
-    <div class="grid-2">
-      <div class="card">
-        <h3>ODS 12: Producción y Consumo Responsables</h3>
-        <p>Garantiza que el flujo sea lo suficientemente rápido para que todos alcancen a almorzar dentro del tiempo del
-          recreo, evitando botar raciones sobrantes por el toque del timbre.</p>
-      </div>
-      <div class="card">
-        <h3>ODS 2: Hambre Cero</h3>
-        <p>El registro de hora, fecha y nombre asegura un reparto 100% equitativo y transparente, garantizando la ración
-          al estudiante que realmente reservó su cupo.</p>
-      </div>
-    </div>
-  </section>
+                    <h4 class="text-white font-poppins fw-bold mb-2">Tu Pase Digital PAE</h4>
+                    <p class="text-bright-sub xsmall font-inter mb-4">
+                        Ingresa al sistema para obtener tu credencial virtual con QR único y gestionar tus reservas de almuerzo escolar.
+                    </p>
 
+                    <div class="row g-2 text-start font-inter xsmall mb-4">
+                        <div class="col-4">
+                            <div class="p-2 rounded-3 bg-dark border border-secondary text-center">
+                                <span class="d-block fs-5"></span>
+                                <span class="text-white fw-bold d-block mt-1">1. Ingresa</span>
+                                <span class="text-bright-sub xsmall">Con tu RUT</span>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-2 rounded-3 bg-dark border border-secondary text-center">
+                                <span class="d-block fs-5"></span>
+                                <span class="text-white fw-bold d-block mt-1">2. Reserva</span>
+                                <span class="text-bright-sub xsmall">Tu cupo hoy</span>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-2 rounded-3 bg-dark border border-secondary text-center">
+                                <span class="d-block fs-5"></span>
+                                <span class="text-white fw-bold d-block mt-1">3. Escanea</span>
+                                <span class="text-bright-sub xsmall">Muestra tu QR</span>
+                            </div>
+                        </div>
+                    </div>
 
-  <section class="container" style="text-align: center; margin-bottom: 40px;">
-    <h2 style="margin-bottom: 20px;">¿Listo para gestionar tu almuerzo?</h2>
-    <a href="login.html" class="cta-button">Ingresar al Sistema →</a>
-  </section>
+                    <div class="d-grid gap-2">
+                        <a href="page/iniciar_sesion.html" class="btn btn-custom-primary font-inter fw-bold py-2">
+                            Ingresar a mi cuenta
+                        </a>
+                    </div>
+                </div>
 
-  <footer>
-    <p>Proyecto JunaWeb - Optimización del Programa de Alimentación Escolar (PAE)</p>
-  </footer>
+                <!-- 2. TARJETA PASE QR REAL (Estudiante: Dante Canales) -->
+                <div id="tarjeta-qr-usuario" class="custom-card p-4 card-hover shadow-lg border-accent-glow d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <span id="qr-rol-usuario" class="text-uppercase text-bright-sub small font-inter fw-bold">--</span>
+                            <h3 id="qr-nombre-usuario" class="text-white font-poppins fw-bold mb-0">--</h3>
+                        </div>
+                        <div id="qr-avatar-usuario" class="badge-custom rounded-circle fs-5 p-2">--</div>
+                    </div>
 
+                    <div class="p-4 text-center my-3 rounded-3 bg-dark border border-secondary">
+                        <div id="qr-code-placeholder" class="text-accent font-inter fw-bold py-3 fs-5">
+                             Código QR Único Activo
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between pt-2 font-inter xsmall">
+                        <span class="text-bright-sub">Estado Reserva</span>
+                        <span class="text-accent fw-bold">Confirmada</span>
+                    </div>
+                </div>
+
+                <!-- 3. LECTOR QR EN VIVO CON CÁMARA (Supervisor: Danny Hernández) -->
+                <div id="tarjeta-supervisor-camara" class="custom-card p-4 card-hover shadow-lg border-accent-glow d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <span class="badge bg-warning text-dark font-inter fw-bold mb-1">Modo Supervisor</span>
+                            <h4 class="text-white font-poppins fw-bold mb-0">Escanear Pase Alumno</h4>
+                        </div>
+                        <span class="fs-4"></span>
+                    </div>
+
+                    <div id="reader-container" class="rounded-3 overflow-hidden border border-secondary mb-3 bg-dark" style="min-height: 250px;">
+                        <div id="reader" style="width: 100%;"></div>
+                    </div>
+
+                    <div id="scanned-result" class="alert alert-dark border border-secondary text-center text-white font-inter xsmall mb-0">
+                        Apunta la cámara al código QR del estudiante.
+                    </div>
+                </div>
+
+                <!-- 4. PANEL DE DIRECCIÓN Y COCINA (Dirección PAE: María José Torres) -->
+                <div id="tarjeta-direccion-pae" class="custom-card p-4 card-hover shadow-lg border-accent-glow d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <span class="badge bg-info text-dark font-inter fw-bold mb-1">Panel de Cocina & Dirección</span>
+                            <h4 class="text-white font-poppins fw-bold mb-0">Raciones del Día</h4>
+                        </div>
+                        <span class="fs-3"></span>
+                    </div>
+
+                    <div class="p-3 text-center my-3 rounded-3 bg-dark border border-secondary">
+                        <span class="text-bright-sub font-inter small d-block mb-1">Total raciones a preparar hoy:</span>
+                        <h1 class="display-3 font-poppins fw-bold text-accent mb-0" id="total-raciones-hoy">248</h1>
+                        <span class="badge bg-success bg-opacity-25 text-accent font-inter xsmall mt-1">
+                            ✓ Calculado según reservas activas
+                        </span>
+                    </div>
+
+                    <div class="rounded-3 p-3 bg-dark border border-secondary mb-3 font-inter">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-white fw-bold small"> Menú Programado:</span>
+                            <span class="badge bg-secondary xsmall">Almuerzo</span>
+                        </div>
+                        <p class="text-bright-sub xsmall mb-0">
+                            • Pollo al horno con arroz primavera<br>
+                            • Ensalada mixta<br>
+                            • Fruta de estación (Manzana)
+                        </p>
+                    </div>
+
+                    <div class="font-inter xsmall">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-bright-sub">Servidos en comedor:</span>
+                            <span class="text-white fw-bold" id="entregados-raciones">112 / 248</span>
+                        </div>
+                        <div class="progress bg-secondary" style="height: 6px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 45%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="text-center py-3 border-top border-dark text-bright-sub small font-inter mt-auto">
+        JunaWeb © 2026 — Programa de Alimentación Escolar (JUNAEB)
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="static/js/index.js"></script>
 </body>
-
 </html>
