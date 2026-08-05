@@ -43,7 +43,7 @@ body.dark-theme {
     pointer-events: none;
 }
 
-/* Todo el contenido por encima del canvas */
+/* Todo el contenido por encima del canvas con flex-wrap implícito */
 header, main, footer {
     position: relative;
     z-index: 1;
@@ -73,6 +73,10 @@ header, main, footer {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--border-color) !important;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .header-logo {
@@ -90,6 +94,10 @@ header, main, footer {
     border-radius: 20px;
     font-size: 0.8rem;
     font-weight: 600;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Tarjetas de Cristal Flotante */
@@ -101,6 +109,9 @@ header, main, footer {
     -webkit-backdrop-filter: blur(20px);
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
 }
 
 .card-hover:hover {
@@ -123,6 +134,7 @@ header, main, footer {
     padding: 0.85rem 1.1rem !important;
     font-size: 0.95rem;
     transition: all 0.3s ease;
+    width: 100%;
 }
 
 .custom-input:focus {
@@ -153,6 +165,13 @@ header, main, footer {
 }
 
 /* BOTONES */
+.btn {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+
 .btn-custom-primary {
     background-color: var(--accent-green);
     color: #070c14;
@@ -184,4 +203,39 @@ header, main, footer {
     border-color: var(--accent-green);
     color: var(--accent-green);
     background: rgba(0, 210, 122, 0.08);
+}
+
+/* =========================================
+   SISTEMA DE DISEÑO RESPONSIVO FLEX-WRAP
+   ========================================= */
+.container, 
+.card-container, 
+.options-grid,
+.nav-menu,
+.form-row,
+.extra-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+img, .card, .custom-card {
+    max-width: 100%;
+    height: auto;
+}
+
+@media (max-width: 768px) {
+    body.dark-theme {
+        padding: 10px;
+    }
+    
+    .container, 
+    .card-container,
+    .options-grid,
+    .form-row {
+        flex-direction: column;
+        width: 100%;
+    }
 }
