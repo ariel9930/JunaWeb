@@ -318,3 +318,45 @@ img, .card {
         white-space: nowrap; /* Evita que "Iniciar Sesión" se rompa en dos líneas */
     }
 }
+/* ARREGLO DEFINITIVO HEADER EN MÓVILES */
+@media (max-width: 576px) {
+    /* Forzamos al header a usar flex con espacio entre logo y botones */
+    .glass-header, 
+    header, 
+    nav {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 8px 10px !important;
+    }
+
+    /* Achicamos levemente el logo/texto para que no ocupe tanto ancho */
+    .glass-header h1,
+    .glass-header .fs-4,
+    .glass-header a span {
+        font-size: 1rem !important;
+    }
+
+    .header-logo {
+        height: 30px !important;
+    }
+
+    /* Contenedor de botones a la derecha */
+    .glass-header .d-flex,
+    .glass-header div:last-child {
+        display: flex !important;
+        gap: 5px !important;
+        margin-left: auto !important; /* Empuja todo a la derecha */
+    }
+
+    /* Evita que "Iniciar Sesión" se divida en dos líneas y pise el logo */
+    .glass-header .btn,
+    .btn-custom-outline,
+    .btn-custom-primary {
+        padding: 5px 8px !important;
+        font-size: 0.75rem !important;
+        white-space: nowrap !important; /* Mantiene la frase en 1 sola línea */
+    }
+}
