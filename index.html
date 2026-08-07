@@ -18,8 +18,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="static/css/iniciar_sesion.css">
 
-    <!-- Librería del Lector de Código QR con Cámara -->
+    <!-- Librerías de QR (HTML5 Scanner y QR Generator) -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 
 <body class="dark-theme d-flex flex-column min-vh-100">
@@ -52,7 +53,7 @@
                     código QR. Más justo, más rápido y completamente automático.
                 </p>
 
-                <!-- Tarjeta de Perfil Resumen (Visible al Iniciar Sesión) -->
+                <!-- Tarjeta de Perfil Resumen (Solo visible al iniciar sesión) -->
                 <div id="perfil-usuario-main" class="custom-card p-3 mb-4 d-none border-accent-glow">
                     <div class="d-flex align-items-center justify-content-between">
                         <div class="d-flex align-items-center gap-3">
@@ -61,13 +62,13 @@
                                 <h5 class="text-white font-poppins fw-bold mb-0" id="main-nombre">--</h5>
                                 <span class="text-bright-sub xsmall">
                                     RUT: <strong id="main-rut" class="text-white">--</strong> |
-                                    Cargo: <strong id="main-curso" class="text-white">--</strong>
+                                    Curso/Cargo: <strong id="main-curso" class="text-white">--</strong>
                                 </span>
                             </div>
                         </div>
-                        <div>
+                        <div class="text-end">
                             <span class="badge bg-success font-inter mb-1 d-block" id="main-rol">--</span>
-                            <button onclick="cerrarSesion()" class="btn btn-sm btn-outline-danger">Cerrar
+                            <button onclick="cerrarSesion()" class="btn btn-sm btn-outline-danger py-0 px-2">Cerrar
                                 Sesión</button>
                         </div>
                     </div>
@@ -84,10 +85,10 @@
                 </div>
             </div>
 
-            <!-- Columna Derecha: Vista Previa, Pase QR, Lector Cámara o Vista Cocina -->
+            <!-- Columna Derecha: Tarjetas Dinámicas -->
             <div class="col-12 col-lg-5">
 
-                <!-- 1. VISTA PREVIA (Visitantes) -->
+                <!-- 1. VISTA PREVIA (Para visitantes sin sesión iniciada) -->
                 <div id="preview-visita" class="custom-card p-4 text-center card-hover shadow-lg">
                     <div class="py-2">
                         <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#00d27a"
@@ -105,30 +106,27 @@
 
                     <h4 class="text-white font-poppins fw-bold mb-2">Tu Pase Digital PAE</h4>
                     <p class="text-bright-sub xsmall font-inter mb-4">
-                        Ingresa al sistema para obtener tu credencial virtual con QR único y gestionar tus reservas de
+                        Ingresa al sistema para reservar tu cupo y obtener tu credencial virtual con QR para el
                         almuerzo escolar.
                     </p>
 
                     <div class="row g-2 text-start font-inter xsmall mb-4">
                         <div class="col-4">
                             <div class="p-2 rounded-3 bg-dark border border-secondary text-center">
-                                <span class="d-block fs-5"></span>
                                 <span class="text-white fw-bold d-block mt-1">1. Ingresa</span>
                                 <span class="text-bright-sub xsmall">Con tu RUT</span>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="p-2 rounded-3 bg-dark border border-secondary text-center">
-                                <span class="d-block fs-5"></span>
                                 <span class="text-white fw-bold d-block mt-1">2. Reserva</span>
-                                <span class="text-bright-sub xsmall">Tu cupo hoy</span>
+                                <span class="text-bright-sub xsmall">Genera tu QR</span>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="p-2 rounded-3 bg-dark border border-secondary text-center">
-                                <span class="d-block fs-5"></span>
                                 <span class="text-white fw-bold d-block mt-1">3. Escanea</span>
-                                <span class="text-bright-sub xsmall">Muestra tu QR</span>
+                                <span class="text-bright-sub xsmall">Muestra tu pase</span>
                             </div>
                         </div>
                     </div>
@@ -140,30 +138,36 @@
                     </div>
                 </div>
 
-                <!-- 2. TARJETA PASE QR REAL (Estudiante: Dante Canales) -->
+                <!-- 2. TARJETA PASE QR (Aparece únicamente cuando el Estudiante presiona "Reservar mi almuerzo") -->
                 <div id="tarjeta-qr-usuario" class="custom-card p-4 card-hover shadow-lg border-accent-glow d-none">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
                             <span id="qr-rol-usuario"
-                                class="text-uppercase text-bright-sub small font-inter fw-bold">--</span>
+                                class="text-uppercase text-bright-sub small font-inter fw-bold">Estudiante</span>
                             <h3 id="qr-nombre-usuario" class="text-white font-poppins fw-bold mb-0">--</h3>
                         </div>
                         <div id="qr-avatar-usuario" class="badge-custom rounded-circle fs-5 p-2">--</div>
                     </div>
 
-                    <div class="p-4 text-center my-3 rounded-3 bg-dark border border-secondary">
-                        <div id="qr-code-placeholder" class="text-accent font-inter fw-bold py-3 fs-5">
-                            Código QR Único Activo
-                        </div>
+                    <!-- Contenedor donde se dibuja dinámicamente el código QR al reservar -->
+                    <div class="p-4 text-center my-3 rounded-3 bg-white border border-secondary d-flex justify-content-center align-items-center"
+                        style="min-height: 200px;">
+                        <div id="qr-code-placeholder"></div>
                     </div>
+
+                    <!-- BOTÓN PARA AGRANDAR QR -->
+                    <button type="button" class="btn btn-sm btn-custom-outline w-100 mb-3 font-inter fw-bold"
+                        onclick="abrirModalQR()">
+                        Agrandar Código QR
+                    </button>
 
                     <div class="d-flex justify-content-between pt-2 font-inter xsmall">
                         <span class="text-bright-sub">Estado Reserva</span>
-                        <span class="text-accent fw-bold">Confirmada</span>
+                        <span class="text-accent fw-bold" id="qr-estado-reserva">Confirmada</span>
                     </div>
                 </div>
 
-                <!-- 3. LECTOR QR EN VIVO CON CÁMARA (Supervisor: Danny Hernández) -->
+                <!-- 3. LECTOR QR EN VIVO (Aparece si inicia sesión el Supervisor) -->
                 <div id="tarjeta-supervisor-camara"
                     class="custom-card p-4 card-hover shadow-lg border-accent-glow d-none">
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -171,7 +175,6 @@
                             <span class="badge bg-warning text-dark font-inter fw-bold mb-1">Modo Supervisor</span>
                             <h4 class="text-white font-poppins fw-bold mb-0">Escanear Pase Alumno</h4>
                         </div>
-                        <span class="fs-4"></span>
                     </div>
 
                     <div id="reader-container" class="rounded-3 overflow-hidden border border-secondary mb-3 bg-dark"
@@ -185,7 +188,7 @@
                     </div>
                 </div>
 
-                <!-- 4. PANEL DE DIRECCIÓN Y COCINA (Dirección PAE: María José Torres) -->
+                <!-- 4. PANEL COCINA/DIRECCIÓN (Aparece si inicia sesión la Directora/Cocina) -->
                 <div id="tarjeta-direccion-pae" class="custom-card p-4 card-hover shadow-lg border-accent-glow d-none">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
@@ -193,13 +196,16 @@
                                 Dirección</span>
                             <h4 class="text-white font-poppins fw-bold mb-0">Raciones del Día</h4>
                         </div>
-                        <span class="fs-3"></span>
+                        <!-- BOTÓN REINICIAR -->
+                        <button class="btn btn-outline-danger btn-sm font-inter" onclick="reiniciarRacionesConClave()">
+                            Reiniciar
+                        </button>
                     </div>
 
                     <div class="p-3 text-center my-3 rounded-3 bg-dark border border-secondary">
                         <span class="text-bright-sub font-inter small d-block mb-1">Total raciones a preparar
                             hoy:</span>
-                        <h1 class="display-3 font-poppins fw-bold text-accent mb-0" id="total-raciones-hoy">248</h1>
+                        <h1 class="display-3 font-poppins fw-bold text-accent mb-0" id="total-raciones-hoy">0</h1>
                         <span class="badge bg-success bg-opacity-25 text-accent font-inter xsmall mt-1">
                             ✓ Calculado según reservas activas
                         </span>
@@ -220,10 +226,10 @@
                     <div class="font-inter xsmall">
                         <div class="d-flex justify-content-between mb-1">
                             <span class="text-bright-sub">Servidos en comedor:</span>
-                            <span class="text-white fw-bold" id="entregados-raciones">112 / 248</span>
+                            <span class="text-white fw-bold" id="entregados-raciones">0 / 0</span>
                         </div>
                         <div class="progress bg-secondary" style="height: 6px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 45%;"></div>
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 0%;"></div>
                         </div>
                     </div>
                 </div>
@@ -232,6 +238,33 @@
 
         </div>
     </main>
+
+    <!-- MODAL PARA MOSTRAR QR EN TAMAÑO GRANDE -->
+    <div class="modal fade" id="modalQR" tabindex="-1" aria-labelledby="modalQRLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark border border-secondary text-white text-center">
+                <div class="modal-header border-bottom border-secondary">
+                    <h5 class="modal-title font-poppins fw-bold" id="modalQRLabel">Pase Digital PAE</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body d-flex flex-column align-items-center py-4">
+                    <p class="text-bright-sub xsmall mb-3">Presenta este código en el scanner del comedor</p>
+
+                    <div class="p-4 bg-white rounded-3 shadow-lg d-flex justify-content-center align-items-center"
+                        style="min-width: 280px; min-height: 280px;">
+                        <div id="qr-code-modal"></div>
+                    </div>
+
+                    <h4 class="font-poppins fw-bold mt-3 mb-0" id="modal-qr-nombre">--</h4>
+                    <span class="text-accent small font-inter fw-bold" id="modal-qr-rut">--</span>
+                </div>
+                <div class="modal-footer border-top border-secondary">
+                    <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <footer class="text-center py-3 border-top border-dark text-bright-sub small font-inter mt-auto">
         JunaWeb © 2026 — Programa de Alimentación Escolar (JUNAEB)

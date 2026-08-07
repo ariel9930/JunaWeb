@@ -1,15 +1,48 @@
 let html5QrcodeScanner = null;
+let modalQRInstance = null;
+let temporizadorAlertaQR = null;
+let escaneoEnPausa = false;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Si no hay nadie o es la primera vez, se inicia en 0
+    // Verificar si ya pasaron 20 horas para reiniciar todos los contadores a 0
+    verificarCiclo20Horas();
+
     if (!localStorage.getItem('racionesPAE')) {
         localStorage.setItem('racionesPAE', '0');
     }
     if (!localStorage.getItem('entregadosPAE')) {
         localStorage.setItem('entregadosPAE', '0');
     }
+    if (!localStorage.getItem('escaneadosHoyPAE')) {
+        localStorage.setItem('escaneadosHoyPAE', JSON.stringify([]));
+    }
     verificarEstadoSesion();
 });
+
+// FUNCIÓN QUE REINICIA TODO EL PANEL Y RESERVAS CADA 20 HORAS
+function verificarCiclo20Horas() {
+    const tiempo20HorasMS = 20 * 60 * 60 * 1000; // 20 horas expresadas en milisegundos
+    const ahora = Date.now();
+    const ultimaActualizacion = localStorage.getItem('ultimaActualizacionPAE');
+
+    if (!ultimaActualizacion || (ahora - parseInt(ultimaActualizacion, 10)) >= tiempo20HorasMS) {
+        // Reiniciar todos los contadores y registros de reservas/escaneos
+        localStorage.setItem('racionesPAE', '0');
+        localStorage.setItem('entregadosPAE', '0');
+        localStorage.setItem('escaneadosHoyPAE', JSON.stringify([]));
+        localStorage.setItem('reservasUsuariosPAE', JSON.stringify({}));
+        
+        // Guardar la nueva marca de tiempo del reinicio
+        localStorage.setItem('ultimaActualizacionPAE', ahora.toString());
+    }
+}
+
+function obtenerBloqueHorario() {
+    const ahora = new Date();
+    const fecha = ahora.toISOString().split('T')[0];
+    const bloqueHoras = Math.floor(ahora.getHours() / 5);
+    return `${fecha}-B${bloqueHoras}`;
+}
 
 function obtenerIniciales(nombre) {
     if (!nombre) return "--";
@@ -21,30 +54,34 @@ function obtenerIniciales(nombre) {
 }
 
 function verificarEstadoSesion() {
-    const usuarioGuardado = localStorage.getItem('usuarioJunaWeb');
+    const usuarioRaw = localStorage.getItem('usuarioJunaWeb') || localStorage.getItem('junaweb_sesion_activa');
 
     const previewVisita = document.getElementById('preview-visita');
     const tarjetaQR = document.getElementById('tarjeta-qr-usuario');
     const tarjetaSupervisor = document.getElementById('tarjeta-supervisor-camara');
     const tarjetaDireccion = document.getElementById('tarjeta-direccion-pae');
     const tarjetaPerfilInferior = document.getElementById('perfil-usuario-main');
+    const headerButtons = document.getElementById('header-buttons');
 
-    // Cargar y mostrar las raciones reales acumuladas
     actualizarContadorRaciones();
 
-    if (usuarioGuardado) {
-        const usuario = JSON.parse(usuarioGuardado);
+    if (usuarioRaw) {
+        const usuario = JSON.parse(usuarioRaw);
 
-        if (previewVisita) previewVisita.classList.add('d-none');
+        if (headerButtons) headerButtons.classList.add('d-none');
 
-        // 1. SI ES MARÍA JOSÉ TORRES (Directora / Cocina)
-        if (usuario.rol === 'director') {
+        const rolLower = (usuario.rol || '').toLowerCase();
+
+        // 1. DIRECTORA / COCINA
+        if (rolLower.includes('director') || rolLower.includes('cocina')) {
+            if (previewVisita) previewVisita.classList.add('d-none');
             if (tarjetaQR) tarjetaQR.classList.add('d-none');
             if (tarjetaSupervisor) tarjetaSupervisor.classList.add('d-none');
             if (tarjetaDireccion) tarjetaDireccion.classList.remove('d-none');
         } 
-        // 2. SI ES DANNY HERNÁNDEZ (Supervisor / Cámara)
-        else if (usuario.rol === 'admin') {
+        // 2. SUPERVISOR / CÁMARA
+        else if (rolLower.includes('admin') || rolLower.includes('supervisor')) {
+            if (previewVisita) previewVisita.classList.add('d-none');
             if (tarjetaQR) tarjetaQR.classList.add('d-none');
             if (tarjetaDireccion) tarjetaDireccion.classList.add('d-none');
             if (tarjetaSupervisor) {
@@ -52,30 +89,54 @@ function verificarEstadoSesion() {
                 iniciarCamaraQR();
             }
         } 
-        // 3. SI ES ESTUDIANTE (Dante Canales o nuevos registrados)
+        // 3. ESTUDIANTE
         else {
             if (tarjetaSupervisor) tarjetaSupervisor.classList.add('d-none');
             if (tarjetaDireccion) tarjetaDireccion.classList.add('d-none');
-            if (tarjetaQR) {
-                document.getElementById('qr-nombre-usuario').innerText = usuario.nombre;
-                document.getElementById('qr-rol-usuario').innerText = usuario.rolNombre || "Estudiante";
-                document.getElementById('qr-avatar-usuario').innerText = obtenerIniciales(usuario.nombre);
-                tarjetaQR.classList.remove('d-none');
+
+            const rutUser = usuario.rutLimpio || usuario.rut;
+            const reservasHechas = JSON.parse(localStorage.getItem('reservasUsuariosPAE') || '{}');
+
+            if (reservasHechas[rutUser]) {
+                if (previewVisita) previewVisita.classList.add('d-none');
+                
+                if (tarjetaQR) {
+                    tarjetaQR.classList.remove('d-none');
+                    const elemNombre = document.getElementById('qr-nombre-usuario');
+                    const elemRol = document.getElementById('qr-rol-usuario');
+                    const elemAvatar = document.getElementById('qr-avatar-usuario');
+
+                    if (elemNombre) elemNombre.innerText = usuario.nombre;
+                    if (elemRol) elemRol.innerText = usuario.rolNombre || usuario.rol || "Estudiante";
+                    if (elemAvatar) elemAvatar.innerText = obtenerIniciales(usuario.nombre);
+
+                    generarCodigoQR(usuario);
+                }
+            } else {
+                if (tarjetaQR) tarjetaQR.classList.add('d-none');
+                if (previewVisita) previewVisita.classList.remove('d-none');
             }
         }
 
-        // Cargar datos del perfil abajo
         if (tarjetaPerfilInferior) {
-            document.getElementById('main-nombre').innerText = usuario.nombre;
-            document.getElementById('main-rut').innerText = usuario.rut;
-            document.getElementById('main-rol').innerText = usuario.rolNombre || "Estudiante";
-            document.getElementById('main-curso').innerText = usuario.curso || "Estudiante";
-            document.getElementById('main-avatar').innerText = obtenerIniciales(usuario.nombre);
+            const mNombre = document.getElementById('main-nombre');
+            const mRut = document.getElementById('main-rut');
+            const mRol = document.getElementById('main-rol');
+            const mCurso = document.getElementById('main-curso');
+            const mAvatar = document.getElementById('main-avatar');
+
+            if (mNombre) mNombre.innerText = usuario.nombre;
+            if (mRut) mRut.innerText = usuario.rutOriginal || usuario.rut || "--";
+            if (mRol) mRol.innerText = usuario.rolNombre || usuario.rol || "Estudiante";
+            if (mCurso) mCurso.innerText = usuario.curso || "Estudiante";
+            if (mAvatar) mAvatar.innerText = obtenerIniciales(usuario.nombre);
+
             tarjetaPerfilInferior.classList.remove('d-none');
         }
 
     } else {
         if (previewVisita) previewVisita.classList.remove('d-none');
+        if (headerButtons) headerButtons.classList.remove('d-none');
         if (tarjetaQR) tarjetaQR.classList.add('d-none');
         if (tarjetaSupervisor) tarjetaSupervisor.classList.add('d-none');
         if (tarjetaDireccion) tarjetaDireccion.classList.add('d-none');
@@ -83,7 +144,75 @@ function verificarEstadoSesion() {
     }
 }
 
-// Actualizar el número de raciones en el panel de María José Torres
+function generarCodigoQR(usuario) {
+    const qrContainer = document.getElementById('qr-code-placeholder');
+    if (!qrContainer) return;
+
+    qrContainer.innerHTML = "";
+
+    const rutText = usuario.rutLimpio || usuario.rut || "SIN-RUT";
+    const bloque = obtenerBloqueHorario();
+    const payloadQR = `PAE-PASE:${rutText}:${usuario.nombre}:${bloque}`;
+
+    try {
+        if (typeof QRCode !== 'undefined') {
+            new QRCode(qrContainer, {
+                text: payloadQR,
+                width: 150,
+                height: 150,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+    } catch (e) {
+        console.error("Error al generar el QR:", e);
+    }
+}
+
+function abrirModalQR() {
+    const usuarioRaw = localStorage.getItem('usuarioJunaWeb') || localStorage.getItem('junaweb_sesion_activa');
+    if (!usuarioRaw) return;
+
+    const usuario = JSON.parse(usuarioRaw);
+    const modalElement = document.getElementById('modalQR');
+    
+    const elemModalNombre = document.getElementById('modal-qr-nombre');
+    const elemModalRut = document.getElementById('modal-qr-rut');
+    if (elemModalNombre) elemModalNombre.innerText = usuario.nombre;
+    if (elemModalRut) elemModalRut.innerText = `RUT: ${usuario.rutOriginal || usuario.rut}`;
+
+    const containerModalQR = document.getElementById('qr-code-modal');
+    if (containerModalQR) {
+        containerModalQR.innerHTML = "";
+        const rutText = usuario.rutLimpio || usuario.rut || "SIN-RUT";
+        const bloque = obtenerBloqueHorario();
+        const payloadQR = `PAE-PASE:${rutText}:${usuario.nombre}:${bloque}`;
+
+        try {
+            if (typeof QRCode !== 'undefined') {
+                new QRCode(containerModalQR, {
+                    text: payloadQR,
+                    width: 250,
+                    height: 250,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    if (modalElement && typeof bootstrap !== 'undefined') {
+        if (!modalQRInstance) {
+            modalQRInstance = new bootstrap.Modal(modalElement);
+        }
+        modalQRInstance.show();
+    }
+}
+
 function actualizarContadorRaciones() {
     const totalRaciones = parseInt(localStorage.getItem('racionesPAE') || '0');
     const entregados = parseInt(localStorage.getItem('entregadosPAE') || '0');
@@ -94,7 +223,6 @@ function actualizarContadorRaciones() {
     if (elemTotal) elemTotal.innerText = totalRaciones;
     if (elemEntregados) elemEntregados.innerText = `${entregados} / ${totalRaciones}`;
 
-    // Actualizar barra de progreso dinámicamente según lo entregado/solicitado
     const progressBar = document.querySelector('#tarjeta-direccion-pae .progress-bar');
     if (progressBar) {
         const porcentaje = totalRaciones > 0 ? Math.round((entregados / totalRaciones) * 100) : 0;
@@ -102,33 +230,91 @@ function actualizarContadorRaciones() {
     }
 }
 
-// FUNCIONALIDAD DE LA CÁMARA PAE
 function iniciarCamaraQR() {
     if (html5QrcodeScanner) return;
 
-    html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
-        fps: 10, 
-        qrbox: { width: 220, height: 220 } 
-    });
+    if (!document.getElementById('css-camera-fix')) {
+        const style = document.createElement('style');
+        style.id = 'css-camera-fix';
+        style.innerHTML = `
+            #reader video, #reader canvas {
+                transform: scaleX(-1) !important;
+                -webkit-transform: scaleX(-1) !important;
+                -moz-transform: scaleX(-1) !important;
+                -ms-transform: scaleX(-1) !important;
+            }
+        `;
+        document.head.appendChild(style);
+    }
 
-    html5QrcodeScanner.render((decodedText, decodedResult) => {
-        const resultContainer = document.getElementById('scanned-result');
-        if (resultContainer) {
+    if (typeof Html5QrcodeScanner !== 'undefined') {
+        html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
+            fps: 10, 
+            qrbox: { width: 220, height: 220 } 
+        });
+
+        html5QrcodeScanner.render((decodedText) => {
+            if (escaneoEnPausa) return;
+
+            const resultContainer = document.getElementById('scanned-result');
+            if (!resultContainer) return;
+
+            escaneoEnPausa = true;
+            resultContainer.style.display = 'block';
+
+            const partes = decodedText.split(':');
+            
+            if (partes.length < 4) {
+                resultContainer.className = "alert alert-warning text-center font-inter xsmall mb-0";
+                resultContainer.innerHTML = "⚠️ Código QR con formato inválido o expirado.";
+                
+                setTimeout(() => {
+                    resultContainer.style.display = 'none';
+                    escaneoEnPausa = false;
+                }, 1500);
+                return;
+            }
+
+            const rutUser = partes[1];
+            const nombreUsuario = partes[2];
+            const bloqueQR = partes[3];
+
+            const idUnicoEscaneo = `${rutUser}_${bloqueQR}`;
+            let listaEscaneados = JSON.parse(localStorage.getItem('escaneadosHoyPAE') || '[]');
+
+            if (listaEscaneados.includes(idUnicoEscaneo)) {
+                resultContainer.className = "alert alert-danger text-center font-inter fw-bold xsmall mb-0";
+                resultContainer.innerHTML = `⚠️ ¡ALERTA! El pase de <strong>${nombreUsuario}</strong> ya fue registrado para este turno.`;
+                
+                setTimeout(() => {
+                    resultContainer.style.display = 'none';
+                    escaneoEnPausa = false;
+                }, 1500);
+                return;
+            }
+
+            listaEscaneados.push(idUnicoEscaneo);
+            localStorage.setItem('escaneadosHoyPAE', JSON.stringify(listaEscaneados));
+
             resultContainer.className = "alert alert-success text-center text-dark font-inter fw-bold xsmall mb-0";
-            resultContainer.innerHTML = `✅ ACCESO CONCEDIDO: ${decodedText}`;
+            resultContainer.innerHTML = `✅ ACCESO CONCEDIDO: ${nombreUsuario}`;
 
-            // Incrementar entregas cuando se escanea
             let entregados = parseInt(localStorage.getItem('entregadosPAE') || '0');
             let total = parseInt(localStorage.getItem('racionesPAE') || '0');
+            
             if (entregados < total) {
                 entregados += 1;
                 localStorage.setItem('entregadosPAE', entregados.toString());
                 actualizarContadorRaciones();
             }
-        }
-    }, (errorMessage) => {
-        // En búsqueda activa de código...
-    });
+
+            setTimeout(() => {
+                resultContainer.style.display = 'none';
+                escaneoEnPausa = false;
+            }, 1500);
+
+        }, (errorMessage) => {});
+    }
 }
 
 function cerrarSesion() {
@@ -137,14 +323,14 @@ function cerrarSesion() {
         html5QrcodeScanner = null;
     }
     localStorage.removeItem('usuarioJunaWeb');
+    localStorage.removeItem('junaweb_sesion_activa');
     window.location.reload();
 }
 
-// RESERVAR RACIÓN (SUMA +1 AL TOTAL REAL)
 function intentarReservar() {
-    const usuarioGuardado = localStorage.getItem('usuarioJunaWeb');
+    const usuarioRaw = localStorage.getItem('usuarioJunaWeb') || localStorage.getItem('junaweb_sesion_activa');
 
-    if (!usuarioGuardado) {
+    if (!usuarioRaw) {
         const alerta = document.getElementById('alerta-reserva');
         if (alerta) {
             alerta.classList.remove('d-none');
@@ -153,38 +339,69 @@ function intentarReservar() {
             }, 1500);
         }
     } else {
-        const usuario = JSON.parse(usuarioGuardado);
+        const usuario = JSON.parse(usuarioRaw);
+        const rolLower = (usuario.rol || '').toLowerCase();
 
-        if (usuario.rol === 'admin' || usuario.rol === 'director') {
-            alert(`El perfil de ${usuario.rolNombre} no requiere reserva de almuerzo.`);
+        if (rolLower.includes('admin') || rolLower.includes('supervisor') || rolLower.includes('director')) {
+            alert(`El perfil no requiere reserva de almuerzo.`);
             return;
         }
 
+        const rutUser = usuario.rutLimpio || usuario.rut;
         const reservasHechas = JSON.parse(localStorage.getItem('reservasUsuariosPAE') || '{}');
 
-        // Si ya reservó este usuario
-        if (reservasHechas[usuario.rut]) {
-            alert(`¡Hola ${usuario.nombre}! Ya tienes tu ración reservada para el día de hoy. 🍱`);
+        const previewVisita = document.getElementById('preview-visita');
+        const tarjetaQR = document.getElementById('tarjeta-qr-usuario');
+
+        if (reservasHechas[rutUser]) {
+            alert(`¡Hola ${usuario.nombre}! Ya reservaste tu almuerzo. Tu código QR ya está generado. 🍱`);
         } else {
-            reservasHechas[usuario.rut] = true;
+            reservasHechas[rutUser] = true;
             localStorage.setItem('reservasUsuariosPAE', JSON.stringify(reservasHechas));
 
-            // Incrementar +1 al contador real partiendo de 0
             let totalActual = parseInt(localStorage.getItem('racionesPAE') || '0');
             totalActual += 1;
             localStorage.setItem('racionesPAE', totalActual.toString());
 
             actualizarContadorRaciones();
-            alert(`🎉 ¡Excelente, ${usuario.nombre}! Tu reserva ha sido confirmada. Ración #${totalActual} registrada.`);
+
+            if (previewVisita) previewVisita.classList.add('d-none');
+            if (tarjetaQR) {
+                tarjetaQR.classList.remove('d-none');
+                generarCodigoQR(usuario);
+            }
+
+            alert(`🎉 ¡Excelente, ${usuario.nombre}! Tu reserva ha sido confirmada. Ya puedes ver tu código QR.`);
         }
     }
 }
+// Función para reiniciar el contador de raciones
+function reiniciarRacionesConClave() {
+    // Clave de seguridad requerida (puedes cambiar "1234" por la clave que prefieras)
+    const CLAVE_CORRECTA = "1234";
 
-// BOTÓN OPCIONAL PARA REINICIAR TODO A 0 CUANDO QUIERAS
-function reiniciarContadoresSistema() {
-    localStorage.setItem('racionesPAE', '0');
-    localStorage.setItem('entregadosPAE', '0');
-    localStorage.removeItem('reservasUsuariosPAE');
-    actualizarContadorRaciones();
-    alert("El sistema de raciones se ha reseteado a 0.");
+    const claveIngresada = prompt("Ingrese la clave de autorización para reiniciar las raciones del día:");
+
+    // Si el usuario cancela el prompt
+    if (claveIngresada === null) return;
+
+    if (claveIngresada === CLAVE_CORRECTA) {
+        // Resetear datos en localStorage (según las variables que maneje tu proyecto)
+        localStorage.setItem("totalRacionesHoy", "0");
+        localStorage.setItem("entregadosRaciones", "0");
+        localStorage.removeItem("reservasActivas"); // Si guardas las reservas aquí
+
+        // Actualizar la interfaz de usuario (DOM)
+        const totalRacionesEl = document.getElementById("total-raciones-hoy");
+        const entregadosRacionesEl = document.getElementById("entregados-raciones");
+        const progressBarEl = document.querySelector("#tarjeta-direccion-pae .progress-bar");
+
+        if (totalRacionesEl) totalRacionesEl.textContent = "0";
+        if (entregadosRacionesEl) entregadosRacionesEl.textContent = "0 / 0";
+        if (progressBarEl) progressBarEl.style.width = "0%";
+
+        alert("¡Las raciones han sido reiniciadas exitosamente!");
+    } else {
+        alert("Clave incorrecta. No tienes permisos para realizar esta acción.");
+    }
 }

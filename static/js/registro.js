@@ -1,75 +1,98 @@
-const baseDeDatosPAE = {
-    "20.123.456-K": "Dante Canales",
-    "18.765.432-1": "Danny Hernández",
-    "15.432.198-7": "María José Torres"
-};
+document.addEventListener("DOMContentLoaded", () => {
+    // Inicializar cuentas por defecto si el localStorage está vacío
+    inicializarCuentasBase();
 
-function filtrarRut(input) {
-    input.value = input.value.replace(/[^0-9.\-kK]/g, '');
+    const regRut = document.getElementById("reg-rut");
+    if (regRut) {
+        regRut.addEventListener("input", (e) => {
+            e.target.value = e.target.value.replace(/[^0-9kK\.\,-]/g, '');
+        });
+    }
+});
+
+// Cuentas por defecto del sistema JunaWeb
+function inicializarCuentasBase() {
+    let usuarios = JSON.parse(localStorage.getItem("junaweb_usuarios"));
+    if (!usuarios || usuarios.length === 0) {
+        const cuentasPredeterminadas = [
+            {
+                nombre: "Dante Canales",
+                rutOriginal: "20.123.456-K",
+                rutLimpio: "20123456K",
+                curso: "Estudiante (Ver pase QR)",
+                rol: "Estudiante",
+                password: "1234"
+            },
+            {
+                nombre: "Danny Hernández",
+                rutOriginal: "18.765.432-1",
+                rutLimpio: "187654321",
+                curso: "Supervisor PAE (Escanear / Validar)",
+                rol: "Supervisor PAE",
+                password: "1234"
+            },
+            {
+                nombre: "María José Torres",
+                rutOriginal: "15.432.198-7",
+                rutLimpio: "154321987",
+                curso: "Directora / Cocina (Contador de raciones)",
+                rol: "Cocina / Manipuladora",
+                password: "1234"
+            }
+        ];
+        localStorage.setItem("junaweb_usuarios", JSON.stringify(cuentasPredeterminadas));
+    }
 }
 
 function procesarRegistro(event) {
     event.preventDefault();
 
-    const nombre = document.getElementById('registro-nombre').value.trim();
-    const rut = document.getElementById('registro-rut').value.trim().toUpperCase();
-    const curso = document.getElementById('registro-curso').value;
-    const clave = document.getElementById('registro-password').value.trim();
-    const alerta = document.getElementById('registro-alert');
+    const alertBox = document.getElementById("register-alert");
+    const nombre = document.getElementById("reg-nombre").value.trim();
+    const rutOriginal = document.getElementById("reg-rut").value.trim();
+    const curso = document.getElementById("reg-curso").value.trim();
+    const password = document.getElementById("reg-password").value.trim();
+    
+    const rolInput = document.getElementById("reg-rol");
+    const rol = rolInput ? rolInput.value : "Estudiante";
 
-    if (!nombre || !rut || !curso || !clave) {
-        alerta.className = 'alert alert-warning py-2 mb-3 font-inter xsmall text-center';
-        alerta.innerText = 'Por favor, completa todos los campos del formulario.';
-        alerta.classList.remove('d-none');
+    const rutLimpio = rutOriginal.replace(/[^0-9kK]/g, '').toUpperCase();
+
+    if (!nombre || !rutLimpio || !curso || !password) {
+        mostrarAlerta(alertBox, "Por favor completa todos los campos.", "alert-danger");
         return;
     }
 
-    if (clave.length < 4) {
-        alerta.className = 'alert alert-warning py-2 mb-3 font-inter xsmall text-center';
-        alerta.innerText = '⚠️ La contraseña debe tener mínimo 4 números.';
-        alerta.classList.remove('d-none');
-        return;
-    }
+    let usuarios = JSON.parse(localStorage.getItem("junaweb_usuarios")) || [];
 
-    const usuariosRegistrados = JSON.parse(localStorage.getItem('usuariosRegistradosPAE') || '{}');
-    const contrasenasGuardadas = JSON.parse(localStorage.getItem('contrasenasPAE') || '{}');
-
-    if (baseDeDatosPAE[rut] || usuariosRegistrados[rut]) {
-        alerta.className = 'alert alert-danger py-2 mb-3 font-inter xsmall text-center';
-        alerta.innerText = 'Esta cuenta ya está creada. Por favor, dirígete a Iniciar Sesión.';
-        alerta.classList.remove('d-none');
+    const existe = usuarios.some(u => u.rutLimpio === rutLimpio);
+    if (existe) {
+        mostrarAlerta(alertBox, "Este RUT ya se encuentra registrado.", "alert-warning");
         return;
     }
 
     const nuevoUsuario = {
         nombre: nombre,
-        rut: rut,
-        rol: "alumno",
-        rolNombre: "Estudiante",
-        curso: curso
+        rutOriginal: rutOriginal,
+        rutLimpio: rutLimpio,
+        curso: curso,
+        rol: rol,
+        password: password
     };
 
-    usuariosRegistrados[rut] = nuevoUsuario;
-    localStorage.setItem('usuariosRegistradosPAE', JSON.stringify(usuariosRegistrados));
+    usuarios.push(nuevoUsuario);
+    localStorage.setItem("junaweb_usuarios", JSON.stringify(usuarios));
 
-    contrasenasGuardadas[rut] = clave;
-    localStorage.setItem('contrasenasPAE', JSON.stringify(contrasenasGuardadas));
-
-    localStorage.setItem('usuarioJunaWeb', JSON.stringify(nuevoUsuario));
-
-    let totalActual = parseInt(localStorage.getItem('racionesPAE') || '0');
-    totalActual += 1;
-    localStorage.setItem('racionesPAE', totalActual.toString());
-
-    const reservasHechas = JSON.parse(localStorage.getItem('reservasUsuariosPAE') || '{}');
-    reservasHechas[rut] = true;
-    localStorage.setItem('reservasUsuariosPAE', JSON.stringify(reservasHechas));
-
-    alerta.className = 'alert alert-success py-2 mb-3 font-inter xsmall text-center';
-    alerta.innerText = `¡Cuenta creada con éxito! Redirigiendo...`;
-    alerta.classList.remove('d-none');
+    mostrarAlerta(alertBox, "¡Cuenta creada con éxito! Redirigiendo...", "alert-success");
 
     setTimeout(() => {
-        window.location.href = '../index.html';
-    }, 1200);
+        window.location.href = "iniciar_sesion.html";
+    }, 1500);
+}
+
+function mostrarAlerta(box, mensaje, tipo) {
+    if (!box) return;
+    box.className = `alert ${tipo} py-2 mb-3 font-inter xsmall text-center`;
+    box.textContent = mensaje;
+    box.classList.remove("d-none");
 }
