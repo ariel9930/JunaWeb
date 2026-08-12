@@ -19,20 +19,73 @@ document.addEventListener('DOMContentLoaded', () => {
     verificarEstadoSesion();
 });
 
+// FUNCIÓN PARA GENERAR SONIDOS DE VALIDACIÓN Y ALERTA
+function emitirSonido(tipo) {
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        
+        const audioCtx = new AudioCtx();
+
+        // Asegurar que el contexto de audio esté activo
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+
+        // 1. SONIDO DE ÉXITO (Un solo beep agudo de 880 Hz)
+        if (tipo === 'exito') {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.15);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        } 
+        // 2. SONIDO DE ALERTA (3 beeps graves de 350 Hz repetidos)
+        else if (tipo === 'alerta') {
+            const tiempos = [0, 0.12, 0.24]; // Tiempos de inicio para los 3 pitidos
+
+            tiempos.forEach((inicio) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = "sawtooth"; // Onda tipo sierra para sonar como alarma
+                osc.frequency.setValueAtTime(350, audioCtx.currentTime + inicio);
+
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime + inicio);
+                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + inicio + 0.08);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(audioCtx.currentTime + inicio);
+                osc.stop(audioCtx.currentTime + inicio + 0.08);
+            });
+        }
+    } catch (e) {
+        console.warn("No se pudo reproducir el efecto de sonido:", e);
+    }
+}
+
 // FUNCIÓN QUE REINICIA TODO EL PANEL Y RESERVAS CADA 20 HORAS
 function verificarCiclo20Horas() {
-    const tiempo20HorasMS = 20 * 60 * 60 * 1000; // 20 horas expresadas en milisegundos
+    const tiempo20HorasMS = 20 * 60 * 60 * 1000;
     const ahora = Date.now();
     const ultimaActualizacion = localStorage.getItem('ultimaActualizacionPAE');
 
     if (!ultimaActualizacion || (ahora - parseInt(ultimaActualizacion, 10)) >= tiempo20HorasMS) {
-        // Reiniciar todos los contadores y registros de reservas/escaneos
         localStorage.setItem('racionesPAE', '0');
         localStorage.setItem('entregadosPAE', '0');
         localStorage.setItem('escaneadosHoyPAE', JSON.stringify([]));
         localStorage.setItem('reservasUsuariosPAE', JSON.stringify({}));
-        
-        // Guardar la nueva marca de tiempo del reinicio
         localStorage.setItem('ultimaActualizacionPAE', ahora.toString());
     }
 }
@@ -72,14 +125,12 @@ function verificarEstadoSesion() {
 
         const rolLower = (usuario.rol || '').toLowerCase();
 
-        // 1. DIRECTORA / COCINA
         if (rolLower.includes('director') || rolLower.includes('cocina')) {
             if (previewVisita) previewVisita.classList.add('d-none');
             if (tarjetaQR) tarjetaQR.classList.add('d-none');
             if (tarjetaSupervisor) tarjetaSupervisor.classList.add('d-none');
             if (tarjetaDireccion) tarjetaDireccion.classList.remove('d-none');
         } 
-        // 2. SUPERVISOR / CÁMARA
         else if (rolLower.includes('admin') || rolLower.includes('supervisor')) {
             if (previewVisita) previewVisita.classList.add('d-none');
             if (tarjetaQR) tarjetaQR.classList.add('d-none');
@@ -89,7 +140,6 @@ function verificarEstadoSesion() {
                 iniciarCamaraQR();
             }
         } 
-        // 3. ESTUDIANTE
         else {
             if (tarjetaSupervisor) tarjetaSupervisor.classList.add('d-none');
             if (tarjetaDireccion) tarjetaDireccion.classList.add('d-none');
@@ -282,16 +332,24 @@ function iniciarCamaraQR() {
             const idUnicoEscaneo = `${rutUser}_${bloqueQR}`;
             let listaEscaneados = JSON.parse(localStorage.getItem('escaneadosHoyPAE') || '[]');
 
+            // --- ESCANEO REPETIDO (ALERTA) ---
             if (listaEscaneados.includes(idUnicoEscaneo)) {
+                // Sonido de alerta triple
+                emitirSonido('alerta');
+
                 resultContainer.className = "alert alert-danger text-center font-inter fw-bold xsmall mb-0";
                 resultContainer.innerHTML = `⚠️ ¡ALERTA! El pase de <strong>${nombreUsuario}</strong> ya fue registrado para este turno.`;
                 
                 setTimeout(() => {
                     resultContainer.style.display = 'none';
                     escaneoEnPausa = false;
-                }, 1500);
+                }, 2000);
                 return;
             }
+
+            // --- ESCANEO EXITOSO (ACCESO CONCEDIDO) ---
+            // Sonido de pitido simple
+            emitirSonido('exito');
 
             listaEscaneados.push(idUnicoEscaneo);
             localStorage.setItem('escaneadosHoyPAE', JSON.stringify(listaEscaneados));
@@ -375,32 +433,25 @@ function intentarReservar() {
         }
     }
 }
-// Función para reiniciar el contador de raciones
+
+// FUNCIÓN PARA REINICIAR EL CONTADOR DE RACIONES CON CLAVE SECRETA
 function reiniciarRacionesConClave() {
-    // Clave de seguridad requerida (puedes cambiar "1234" por la clave que prefieras)
     const CLAVE_CORRECTA = "1234";
 
     const claveIngresada = prompt("Ingrese la clave de autorización para reiniciar las raciones del día:");
 
-    // Si el usuario cancela el prompt
     if (claveIngresada === null) return;
 
     if (claveIngresada === CLAVE_CORRECTA) {
-        // Resetear datos en localStorage (según las variables que maneje tu proyecto)
-        localStorage.setItem("totalRacionesHoy", "0");
-        localStorage.setItem("entregadosRaciones", "0");
-        localStorage.removeItem("reservasActivas"); // Si guardas las reservas aquí
+        localStorage.setItem('racionesPAE', '0');
+        localStorage.setItem('entregadosPAE', '0');
+        localStorage.setItem('escaneadosHoyPAE', JSON.stringify([]));
+        localStorage.setItem('reservasUsuariosPAE', JSON.stringify({}));
+        localStorage.setItem('ultimaActualizacionPAE', Date.now().toString());
 
-        // Actualizar la interfaz de usuario (DOM)
-        const totalRacionesEl = document.getElementById("total-raciones-hoy");
-        const entregadosRacionesEl = document.getElementById("entregados-raciones");
-        const progressBarEl = document.querySelector("#tarjeta-direccion-pae .progress-bar");
+        actualizarContadorRaciones();
 
-        if (totalRacionesEl) totalRacionesEl.textContent = "0";
-        if (entregadosRacionesEl) entregadosRacionesEl.textContent = "0 / 0";
-        if (progressBarEl) progressBarEl.style.width = "0%";
-
-        alert("¡Las raciones han sido reiniciadas exitosamente!");
+        alert("¡Las raciones y reservas han sido reiniciadas exitosamente!");
     } else {
         alert("Clave incorrecta. No tienes permisos para realizar esta acción.");
     }
