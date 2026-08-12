@@ -3,7 +3,7 @@
     --bg-body-start: #04080c;
     --bg-body-end: #0a111a;
     --bg-card: rgba(18, 29, 43, 0.6); /* Semitransparente para efecto cristal */
-    --bg-header: rgba(6, 11, 17, 0.8);
+    --bg-header: rgba(6, 11, 17, 0.9);
     --bg-inner-box: #080d14;
     --accent-green: #00d27a;
     --accent-green-hover: #00b368;
@@ -36,31 +36,46 @@
     font-family: 'Inter', sans-serif;
 }
 
+/* Reset Global & Body sin márgenes que corten el Header */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    overflow-x: hidden;
+}
+
 body.dark-theme {
     /* Fondo radial con destello sutil verde en la parte superior izquierda */
     background: radial-gradient(circle at 10% 20%, rgba(0, 210, 122, 0.03) 0%, transparent 40%),
                 linear-gradient(135deg, var(--bg-body-start) 0%, var(--bg-body-end) 100%);
     font-family: 'Inter', sans-serif;
     color: var(--text-white);
-    margin: 0;
-    padding: 0;
     min-height: 100vh;
 }
 
-/* Cabecera con Glassmorphism */
+/* Cabecera de borde a borde con Glassmorphism */
 .glass-header {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
     background-color: var(--bg-header) !important;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
+    padding: 12px 20px;
 }
 
 .header-logo {
-    height: 48px;
+    height: 42px;
     width: auto;
     border-radius: 6px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
@@ -78,7 +93,7 @@ body.dark-theme {
 /* Texto con Gradiente para el H1 */
 .text-gradient {
     background: linear-gradient(to right, #ffffff, #a3b8cc);
-
+    -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -181,10 +196,9 @@ body.dark-theme {
     font-weight: 600;
     transition: all 0.3s ease;
     display: inline-flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     justify-content: center;
-
 }
 
 .btn-custom-primary {
@@ -256,107 +270,366 @@ body.dark-theme {
 .nav-menu,
 .extra-links {
     display: flex;
-    flex-wrap: wrap; /* Permite que los elementos bajen en pantallas chicas */
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 15px; /* Espaciado entre elementos cuando se acomodan */
+    gap: 15px;
 }
 
-/* Ajuste general para imágenes e insumos en móvil */
+/* Ajuste general para imágenes e insumos */
 img, .card {
     max-width: 100%;
     height: auto;
 }
 
+/* RESPONSIVE DESIGN - TABLETS Y MÓVILES */
 @media (max-width: 768px) {
+    /* Se remueve el padding en body para evitar franjas laterales */
     body.dark-theme {
-        padding: 10px;
+        padding: 0;
     }
     
     .container, 
     .card-container,
     .options-grid {
-        flex-direction: column; /* Pone una tarjeta sobre otra en celular */
+        flex-direction: column;
         width: 100%;
     }
 }
-/* Corrección de alineación del Header para Celular */
+
+/* ARREGLO DEFINITIVO HEADER MÓVIL DE BORDE A BORDE CON BUEN ESPACIADO */
 .glass-header {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px;
+    padding: 10px 16px;
+    gap: 12px;
+}
+
+.glass-header a,
+.glass-header .navbar-brand {
+    display: flex;
+    align-items: center;
     gap: 10px;
 }
 
-/* Contenedor de la marca / título */
-.glass-header .navbar-brand,
-.glass-header .d-flex {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+#header-buttons,
+.glass-header #header-buttons {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 10px !important;
 }
 
-/* Ajuste específico para pantallas pequeñas (Celulares) */
 @media (max-width: 576px) {
     .glass-header {
-        justify-content: space-between;
+        padding: 8px 12px !important;
     }
 
-    /* Reducir ligeramente el tamaño del texto del logo en celular para dar espacio */
-    .glass-header h1, 
-    .glass-header .logo-text {
-        font-size: 1.2rem !important;
+    .header-logo {
+        height: 32px !important;
     }
 
-    /* Reducir el padding de los botones arriba para que no colapsen */
-    .glass-header .btn,
-    .btn-custom-outline {
-        padding: 6px 12px !important;
-        font-size: 0.85rem !important;
-        white-space: nowrap; /* Evita que "Iniciar Sesión" se rompa en dos líneas */
-    }
-}
-/* ARREGLO DEFINITIVO HEADER EN MÓVILES */
-@media (max-width: 576px) {
-    /* Forzamos al header a usar flex con espacio entre logo y botones */
-    .glass-header, 
-    header, 
-    nav {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        padding: 8px 10px !important;
-    }
-
-    /* Achicamos levemente el logo/texto para que no ocupe tanto ancho */
-    .glass-header h1,
-    .glass-header .fs-4,
+    .logo-text,
     .glass-header a span {
         font-size: 1rem !important;
     }
 
-    .header-logo {
-        height: 30px !important;
+    #header-buttons {
+        gap: 8px !important;
     }
 
-    /* Contenedor de botones a la derecha */
-    .glass-header .d-flex,
-    .glass-header div:last-child {
-        display: flex !important;
-        gap: 5px !important;
-        margin-left: auto !important; /* Empuja todo a la derecha */
-    }
-
-    /* Evita que "Iniciar Sesión" se divida en dos líneas y pise el logo */
     .glass-header .btn,
-    .btn-custom-outline,
-    .btn-custom-primary {
-        padding: 5px 8px !important;
-        font-size: 0.75rem !important;
-        white-space: nowrap !important; /* Mantiene la frase en 1 sola línea */
+    #header-buttons .btn {
+        padding: 6px 12px !important;
+        font-size: 0.78rem !important;
+        white-space: nowrap !important;
+        line-height: 1.2 !important;
+        border-radius: 8px;
     }
+}
+
+/* Ajuste para pantallas extremadamente estrechas (<380px) */
+@media (max-width: 380px) {
+    .glass-header {
+        padding: 8px 8px !important;
+    }
+
+    #header-buttons {
+        gap: 6px !important;
+    }
+
+    .glass-header .btn,
+    #header-buttons .btn {
+        padding: 5px 8px !important;
+        font-size: 0.72rem !important;
+    }
+}
+
+/* =========================================
+   MODAL DE ALERTAS & PROMPT PERSONALIZADO
+   ========================================= */
+.custom-alert-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(4, 8, 12, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    animation: fadeInModal 0.25s forwards ease-out;
+}
+
+.custom-alert-box {
+    background: rgba(18, 29, 43, 0.95);
+    border: 1px solid rgba(0, 210, 122, 0.3);
+    border-radius: 20px;
+    padding: 24px 28px;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 210, 122, 0.15);
+    text-align: center;
+    color: #ffffff;
+    transform: scale(0.9);
+    animation: scaleUpModal 0.25s forwards ease-out;
+}
+
+.custom-alert-icon {
+    font-size: 2.2rem;
+    margin-bottom: 12px;
+}
+
+.custom-alert-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 8px;
+}
+
+.custom-alert-message {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: #94a3b8;
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+@keyframes fadeInModal {
+    to { opacity: 1; }
+}
+
+@keyframes scaleUpModal {
+    to { transform: scale(1); }
+}
+
+
+/* ===================================================
+   MODAL DE ALERTA CENTRADO (JUNAWEB GLASSMORPHISM)
+   =================================================== */
+
+/* Fondo oscuro translúcido con desenfoque que cubre toda la pantalla */
+.custom-alert-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(4, 8, 14, 0.78);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    z-index: 99999;
+    opacity: 0;
+    animation: fadeInModal 0.2s forwards ease-out;
+}
+
+/* Tarjeta contenedora centrada al medio */
+.custom-alert-box {
+    background: rgba(18, 30, 46, 0.95);
+    border: 1.5px solid rgba(0, 210, 122, 0.4);
+    border-radius: 20px;
+    padding: 36px 30px 30px 30px;
+    max-width: 440px;
+    width: 90%;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 210, 122, 0.15);
+    text-align: center;
+    color: #ffffff;
+    transform: scale(0.85);
+    animation: scaleUpModal 0.25s forwards ease-out;
+}
+
+/* Ícono de escudo con check verde */
+.custom-alert-shield-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 20px auto;
+    border-radius: 50%;
+    background: rgba(0, 210, 122, 0.12);
+    border: 1px solid rgba(0, 210, 122, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-alert-shield-icon svg {
+    width: 34px;
+    height: 34px;
+    stroke: #00d27a;
+    stroke-width: 2.2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Título principal */
+.custom-alert-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #ffffff;
+    margin-bottom: 12px;
+    letter-spacing: -0.3px;
+}
+
+/* Mensaje del cuerpo */
+.custom-alert-message {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    color: #a0aec0;
+    line-height: 1.5;
+    margin-bottom: 28px;
+    padding: 0 10px;
+}
+
+/* Botón estilizado verde neón */
+.btn-alert-confirm {
+    width: 100%;
+    padding: 14px 0;
+    background: rgba(0, 210, 122, 0.12);
+    border: 1.5px solid #00d27a;
+    border-radius: 12px;
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 15px rgba(0, 210, 122, 0.2);
+}
+
+.btn-alert-confirm:hover {
+    background: #00d27a;
+    color: #0b131e;
+    box-shadow: 0 0 25px rgba(0, 210, 122, 0.5);
+}
+
+/* Animaciones */
+@keyframes fadeInModal {
+    to { opacity: 1; }
+}
+
+@keyframes scaleUpModal {
+    to { transform: scale(1); }
+}
+
+/* ALERTA MODAL FIJA Y CENTRADA */
+body.modal-open {
+    overflow: hidden !important;
+}
+
+.custom-alert-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(4, 8, 14, 0.85) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    z-index: 999999 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.custom-alert-box {
+    position: relative !important;
+    background: #121e2e !important;
+    border: 1.5px solid #00d27a !important;
+    border-radius: 20px !important;
+    padding: 32px 24px !important;
+    max-width: 420px !important;
+    width: 90% !important;
+    box-shadow: 0 0 40px rgba(0, 210, 122, 0.25) !important;
+    text-align: center !important;
+    color: #ffffff !important;
+}
+
+.custom-alert-shield-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 16px auto;
+    border-radius: 50%;
+    background: rgba(0, 210, 122, 0.15);
+    border: 1px solid #00d27a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-alert-shield-icon svg {
+    width: 28px;
+    height: 28px;
+    stroke: #00d27a;
+    stroke-width: 2.5;
+    fill: none;
+}
+
+.custom-alert-title {
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 1.35rem !important;
+    color: #ffffff !important;
+    margin-bottom: 10px !important;
+}
+
+.custom-alert-message {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.9rem !important;
+    color: #94a3b8 !important;
+    line-height: 1.4 !important;
+    margin-bottom: 24px !important;
+}
+
+.btn-alert-confirm {
+    width: 100% !important;
+    padding: 12px 0 !important;
+    background: rgba(0, 210, 122, 0.15) !important;
+    border: 1.5px solid #00d27a !important;
+    border-radius: 10px !important;
+    color: #ffffff !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    cursor: pointer !important;
+    box-shadow: 0 0 15px rgba(0, 210, 122, 0.2) !important;
+}
+
+.btn-alert-confirm:hover {
+    background: #00d27a !important;
+    color: #000000 !important;
 }

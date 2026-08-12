@@ -385,7 +385,7 @@ function cerrarSesion() {
     window.location.reload();
 }
 
-function intentarReservar() {
+async function intentarReservar() {
     const usuarioRaw = localStorage.getItem('usuarioJunaWeb') || localStorage.getItem('junaweb_sesion_activa');
 
     if (!usuarioRaw) {
@@ -401,7 +401,7 @@ function intentarReservar() {
         const rolLower = (usuario.rol || '').toLowerCase();
 
         if (rolLower.includes('admin') || rolLower.includes('supervisor') || rolLower.includes('director')) {
-            alert(`El perfil no requiere reserva de almuerzo.`);
+            await mostrarAlertaEstetica('Acceso No Requerido', 'Tu perfil no requiere realizar reserva de almuerzo.', 'ℹ️');
             return;
         }
 
@@ -412,7 +412,7 @@ function intentarReservar() {
         const tarjetaQR = document.getElementById('tarjeta-qr-usuario');
 
         if (reservasHechas[rutUser]) {
-            alert(`¡Hola ${usuario.nombre}! Ya reservaste tu almuerzo. Tu código QR ya está generado. 🍱`);
+            await mostrarAlertaEstetica('Reserva Ya Realizada', `¡Hola ${usuario.nombre}! Ya reservaste tu almuerzo. Tu código QR se encuentra disponible en pantalla.`, '🍱');
         } else {
             reservasHechas[rutUser] = true;
             localStorage.setItem('reservasUsuariosPAE', JSON.stringify(reservasHechas));
@@ -429,16 +429,15 @@ function intentarReservar() {
                 generarCodigoQR(usuario);
             }
 
-            alert(`🎉 ¡Excelente, ${usuario.nombre}! Tu reserva ha sido confirmada. Ya puedes ver tu código QR.`);
+            await mostrarAlertaEstetica('¡Reserva Confirmada!', `🎉 ¡Excelente, ${usuario.nombre}! Tu cupo ha sido reservado con éxito.`, '✅');
         }
     }
 }
 
-// FUNCIÓN PARA REINICIAR EL CONTADOR DE RACIONES CON CLAVE SECRETA
-function reiniciarRacionesConClave() {
+async function reiniciarRacionesConClave() {
     const CLAVE_CORRECTA = "1234";
 
-    const claveIngresada = prompt("Ingrese la clave de autorización para reiniciar las raciones del día:");
+    const claveIngresada = await mostrarPromptEstetico("Autorización Requerida", "Ingrese la clave de administrador para reiniciar el contador de raciones:");
 
     if (claveIngresada === null) return;
 
@@ -451,8 +450,156 @@ function reiniciarRacionesConClave() {
 
         actualizarContadorRaciones();
 
-        alert("¡Las raciones y reservas han sido reiniciadas exitosamente!");
+        await mostrarAlertaEstetica('Reinicio Completado', 'Las raciones y reservas del día han sido reiniciadas a cero.', '🔄');
     } else {
-        alert("Clave incorrecta. No tienes permisos para realizar esta acción.");
+        await mostrarAlertaEstetica('Clave Incorrecta', 'No tienes permisos de autorización para realizar esta acción.', '❌');
     }
+}
+
+
+
+
+
+
+/* Cambios de prueba */
+
+// --- SISTEMA DE ALERTAS ESTÉTICAS CENTRADAS ---
+function mostrarAlertaEstetica(titulo, mensaje, icono = '🔔') {
+    return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'custom-alert-overlay';
+        
+        overlay.innerHTML = `
+            <div class="custom-alert-box">
+                <div class="custom-alert-icon">${icono}</div>
+                <div class="custom-alert-title text-white">${titulo}</div>
+                <div class="custom-alert-message">${mensaje}</div>
+                <button id="btn-cerrar-alerta" class="btn btn-custom-primary w-100 py-2 font-poppins fw-bold glow-btn">
+                    Aceptar
+                </button>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        document.getElementById('btn-cerrar-alerta').addEventListener('click', () => {
+            overlay.remove();
+            resolve();
+        });
+    });
+}
+
+// --- PROMPT PERSONALIZADO PARA CLAVE DE REINICIO ---
+function mostrarPromptEstetico(titulo, mensaje) {
+    return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'custom-alert-overlay';
+
+        overlay.innerHTML = `
+            <div class="custom-alert-box">
+                <div class="custom-alert-icon">🔒</div>
+                <div class="custom-alert-title text-white">${titulo}</div>
+                <div class="custom-alert-message">${mensaje}</div>
+                <input type="password" id="input-prompt-clave" class="form-control custom-input mb-3 text-center" placeholder="••••" maxlength="10">
+                <div class="d-flex gap-2">
+                    <button id="btn-cancelar-prompt" class="btn btn-custom-outline w-50 py-2 font-poppins fw-bold xsmall">Cancelar</button>
+                    <button id="btn-aceptar-prompt" class="btn btn-custom-primary w-50 py-2 font-poppins fw-bold glow-btn xsmall">Confirmar</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        const input = document.getElementById('input-prompt-clave');
+        input.focus();
+
+        document.getElementById('btn-aceptar-prompt').addEventListener('click', () => {
+            const valor = input.value;
+            overlay.remove();
+            resolve(valor);
+        });
+
+        document.getElementById('btn-cancelar-prompt').addEventListener('click', () => {
+            overlay.remove();
+            resolve(null);
+        });
+    });
+}
+
+// --- ALERTA CENTRADA ESTILO JUNAWEB ---
+function mostrarAlertaEstetica(titulo, mensaje, textoBoton = "CERRAR Y VER QR") {
+    return new Promise((resolve) => {
+        // Eliminar cualquier alerta existente
+        const alertaExistente = document.querySelector('.custom-alert-overlay');
+        if (alertaExistente) alertaExistente.remove();
+
+        const overlay = document.createElement('div');
+        overlay.className = 'custom-alert-overlay';
+        
+        overlay.innerHTML = `
+            <div class="custom-alert-box">
+                <div class="custom-alert-shield-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        <path d="M9 12l2 2 4-4"></path>
+                    </svg>
+                </div>
+                <h3 class="custom-alert-title">${titulo}</h3>
+                <p class="custom-alert-message">${mensaje}</p>
+                <button id="btn-cerrar-alerta" class="btn-alert-confirm">
+                    ${textoBoton}
+                </button>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        document.getElementById('btn-cerrar-alerta').addEventListener('click', () => {
+            overlay.remove();
+            resolve();
+        });
+    });
+}
+
+async function confirmarReservaEjemplo() {
+    await mostrarAlertaEstetica(
+        "Reserva Confirmada",
+        "Tu cupo para el Programa de Alimentación Escolar (PAE) ha sido reservado con éxito para el turno de hoy.",
+        "CERRAR Y VER QR"
+    );
+}
+
+function mostrarAlertaEstetica(titulo, mensaje, textoBoton = "Aceptar") {
+    return new Promise((resolve) => {
+        // Eliminar alerta previa si existe
+        const antigua = document.getElementById('junaweb-modal-alerta');
+        if (antigua) antigua.remove();
+
+        const overlay = document.createElement('div');
+        overlay.id = 'junaweb-modal-alerta';
+        overlay.className = 'custom-alert-overlay';
+        
+        overlay.innerHTML = `
+            <div class="custom-alert-box">
+                <div class="custom-alert-shield-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        <path d="M9 12l2 2 4-4"></path>
+                    </svg>
+                </div>
+                <h3 class="custom-alert-title">${titulo}</h3>
+                <p class="custom-alert-message">${mensaje}</p>
+                <button id="btn-cerrar-alerta" class="btn-alert-confirm">${textoBoton}</button>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+        document.body.classList.add('modal-open');
+
+        document.getElementById('btn-cerrar-alerta').onclick = () => {
+            overlay.remove();
+            document.body.classList.remove('modal-open');
+            resolve();
+        };
+    });
 }

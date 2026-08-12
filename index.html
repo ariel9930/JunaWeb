@@ -25,20 +25,21 @@
 
 <body class="dark-theme d-flex flex-column min-vh-100">
 
-    <header class="p-3 border-bottom border-dark sticky-top glass-header">
-        <div class="container-fluid d-flex justify-content-between align-items-center px-4">
-            <a href="index.html" class="d-flex align-items-center text-decoration-none">
-                <img src="static/images/logo.png" alt="Logo JunaWeb" class="header-logo">
-                <span class="ms-3 fs-4 font-poppins fw-bold">
-                    <span class="text-white">Juna</span><span class="text-accent">Web</span>
-                </span>
-            </a>
-            <div class="d-flex gap-2" id="header-buttons">
-                <a href="page/iniciar_sesion.html" class="btn btn-custom-outline btn-sm">Iniciar Sesión</a>
-                <a href="page/registro.html" class="btn btn-custom-primary btn-sm">Registrarse</a>
-            </div>
+<!-- HEADER DE BORDE A BORDE (WIDTH: 100%) -->
+<header class="glass-header sticky-top w-100 p-0 m-0">
+    <div class="container-fluid d-flex justify-content-between align-items-center py-2 px-3 px-sm-4">
+        <a href="index.html" class="d-flex align-items-center text-decoration-none">
+            <img src="static/images/logo.png" alt="Logo JunaWeb" class="header-logo">
+            <span class="font-poppins fw-bold logo-text ms-2">
+                <span class="text-white">Juna</span><span class="text-accent">Web</span>
+            </span>
+        </a>
+        <div class="d-flex align-items-center gap-2" id="header-buttons">
+            <a href="page/iniciar_sesion.html" class="btn btn-custom-outline btn-sm">Iniciar Sesión</a>
+            <a href="page/registro.html" class="btn btn-custom-primary btn-sm">Registrarse</a>
         </div>
-    </header>
+    </div>
+</header>
 
     <main class="container d-flex flex-grow-1 align-items-center py-5">
         <div class="row w-100 align-items-center justify-content-between g-5">
