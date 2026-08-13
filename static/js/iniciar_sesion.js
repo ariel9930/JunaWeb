@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Carga directa de las 3 cuentas exigidas
+// Carga directa de las 3 cuentas exigidas (Contraseñas estandarizadas a "1234")
 function cargarCuentasPredeterminadas() {
     const cuentasBase = [
         {
@@ -26,7 +26,7 @@ function cargarCuentasPredeterminadas() {
             rutLimpio: "20123456K",
             curso: "3°C",
             rol: "Estudiante",
-            password: "676767"
+            password: "1234"
         },
         {
             nombre: "Danny Hernández",
@@ -34,7 +34,7 @@ function cargarCuentasPredeterminadas() {
             rutLimpio: "187654321",
             curso: "Supervisión PAE",
             rol: "Supervisor (Escanear / Validar)",
-            password: "676767"
+            password: "1234"
         },
         {
             nombre: "María José Torres",
@@ -42,13 +42,13 @@ function cargarCuentasPredeterminadas() {
             rutLimpio: "154321987",
             curso: "Cocina / Comedor",
             rol: "Directora / Cocina (Contador de raciones)",
-            password: "676767"
+            password: "1234"
         }
     ];
 
     let usuariosGuardados = JSON.parse(localStorage.getItem("junaweb_usuarios")) || [];
 
-    // Fusionar o reescribir las cuentas base para asegurar que siempre estén
+    // Fusionar o reescribir las cuentas base para asegurar que siempre estén sincronizadas
     cuentasBase.forEach(cuentaBase => {
         const existeIndex = usuariosGuardados.findIndex(u => u.rutLimpio === cuentaBase.rutLimpio);
         if (existeIndex !== -1) {

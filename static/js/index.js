@@ -1,9 +1,11 @@
 let html5QrcodeScanner = null;
 let modalQRInstance = null;
-let temporizadorAlertaQR = null;
 let escaneoEnPausa = false;
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Inyectar estilos visuales universales para todas las alertas flotantes
+    inyectarEstilosPopup();
+
     // Verificar si ya pasaron 20 horas para reiniciar todos los contadores a 0
     verificarCiclo20Horas();
 
@@ -19,20 +21,100 @@ document.addEventListener('DOMContentLoaded', () => {
     verificarEstadoSesion();
 });
 
-// FUNCIÓN PARA GENERAR SONIDOS DE VALIDACIÓN Y ALERTA
+// APAGADO AUTOMÁTICO DE CÁMARA AL CERRAR O NAVEGAR FUERA DE LA PÁGINA
+window.addEventListener('beforeunload', () => {
+    if (html5QrcodeScanner) {
+        try {
+            html5QrcodeScanner.clear().catch(err => console.error("Error al cerrar cámara:", err));
+        } catch (e) {
+            console.warn("Cámara ya liberada.", e);
+        }
+    }
+});
+
+// INYECCIÓN DINÁMICA DE ESTILOS CSS PARA MODALES Y ALERTAS FLOTANTES EN EL CENTRO
+function inyectarEstilosPopup() {
+    if (document.getElementById('css-popups-junaweb')) return;
+    const style = document.createElement('style');
+    style.id = 'css-popups-junaweb';
+    style.innerHTML = `
+        /* Overlay que oscurece la pantalla entera y centra el contenido */
+        .custom-alert-overlay, .custom-popup-overlay {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background: rgba(0, 0, 0, 0.75) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            z-index: 999999 !important;
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        /* Cajón modal elegante centrado */
+        .custom-alert-box, .custom-popup-box {
+            width: 90% !important;
+            max-width: 420px !important;
+            padding: 28px !important;
+            border-radius: 20px !important;
+            text-align: center !important;
+            background: rgba(15, 23, 42, 0.95) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(16, 185, 129, 0.15) !important;
+            color: #ffffff !important;
+        }
+
+        .custom-alert-shield-icon {
+            font-size: 2.8rem;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .custom-popup-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .custom-popup-progress {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 18px;
+            overflow: hidden;
+        }
+
+        .custom-popup-bar {
+            height: 100%;
+            width: 100%;
+            animation: shrinkProgress linear forwards;
+        }
+
+        @keyframes shrinkProgress { from { width: 100%; } to { width: 0%; } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+    `;
+    document.head.appendChild(style);
+}
+
+// GENERADOR DE SONIDOS DE VALIDACIÓN
 function emitirSonido(tipo) {
     try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         if (!AudioCtx) return;
-        
         const audioCtx = new AudioCtx();
 
-        // Asegurar que el contexto de audio esté activo
         if (audioCtx.state === 'suspended') {
             audioCtx.resume();
         }
 
-        // 1. SONIDO DE ÉXITO (Un solo beep agudo de 880 Hz)
         if (tipo === 'exito') {
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
@@ -48,16 +130,12 @@ function emitirSonido(tipo) {
 
             osc.start();
             osc.stop(audioCtx.currentTime + 0.15);
-        } 
-        // 2. SONIDO DE ALERTA (3 beeps graves de 350 Hz repetidos)
-        else if (tipo === 'alerta') {
-            const tiempos = [0, 0.12, 0.24]; // Tiempos de inicio para los 3 pitidos
-
-            tiempos.forEach((inicio) => {
+        } else if (tipo === 'alerta') {
+            [0, 0.12, 0.24].forEach((inicio) => {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
 
-                osc.type = "sawtooth"; // Onda tipo sierra para sonar como alarma
+                osc.type = "sawtooth";
                 osc.frequency.setValueAtTime(350, audioCtx.currentTime + inicio);
 
                 gain.gain.setValueAtTime(0.2, audioCtx.currentTime + inicio);
@@ -75,7 +153,7 @@ function emitirSonido(tipo) {
     }
 }
 
-// FUNCIÓN QUE REINICIA TODO EL PANEL Y RESERVAS CADA 20 HORAS
+// REINICIO CADA 20 HORAS
 function verificarCiclo20Horas() {
     const tiempo20HorasMS = 20 * 60 * 60 * 1000;
     const ahora = Date.now();
@@ -280,6 +358,7 @@ function actualizarContadorRaciones() {
     }
 }
 
+// INICIO Y LOGICA CONTINUA DEL LECTOR QR
 function iniciarCamaraQR() {
     if (html5QrcodeScanner) return;
 
@@ -305,23 +384,16 @@ function iniciarCamaraQR() {
 
         html5QrcodeScanner.render((decodedText) => {
             if (escaneoEnPausa) return;
-
-            const resultContainer = document.getElementById('scanned-result');
-            if (!resultContainer) return;
-
             escaneoEnPausa = true;
-            resultContainer.style.display = 'block';
 
+            const DURACION_ALERTA_MS = 2500;
             const partes = decodedText.split(':');
-            
-            if (partes.length < 4) {
-                resultContainer.className = "alert alert-warning text-center font-inter xsmall mb-0";
-                resultContainer.innerHTML = "⚠️ Código QR con formato inválido o expirado.";
-                
-                setTimeout(() => {
-                    resultContainer.style.display = 'none';
-                    escaneoEnPausa = false;
-                }, 1500);
+
+            if (partes.length < 4 || partes[0] !== 'PAE-PASE') {
+                emitirSonido('alerta');
+                mostrarPopupEscaneo('invalido', 'Código QR no válido o desactualizado.', DURACION_ALERTA_MS);
+
+                setTimeout(() => { escaneoEnPausa = false; }, DURACION_ALERTA_MS);
                 return;
             }
 
@@ -332,30 +404,19 @@ function iniciarCamaraQR() {
             const idUnicoEscaneo = `${rutUser}_${bloqueQR}`;
             let listaEscaneados = JSON.parse(localStorage.getItem('escaneadosHoyPAE') || '[]');
 
-            // --- ESCANEO REPETIDO (ALERTA) ---
             if (listaEscaneados.includes(idUnicoEscaneo)) {
-                // Sonido de alerta triple
                 emitirSonido('alerta');
+                mostrarPopupEscaneo('alerta', `El pase de <strong>${nombreUsuario}</strong> ya fue registrado para este turno.`, DURACION_ALERTA_MS);
 
-                resultContainer.className = "alert alert-danger text-center font-inter fw-bold xsmall mb-0";
-                resultContainer.innerHTML = `⚠️ ¡ALERTA! El pase de <strong>${nombreUsuario}</strong> ya fue registrado para este turno.`;
-                
-                setTimeout(() => {
-                    resultContainer.style.display = 'none';
-                    escaneoEnPausa = false;
-                }, 2000);
+                setTimeout(() => { escaneoEnPausa = false; }, DURACION_ALERTA_MS);
                 return;
             }
 
-            // --- ESCANEO EXITOSO (ACCESO CONCEDIDO) ---
-            // Sonido de pitido simple
             emitirSonido('exito');
-
             listaEscaneados.push(idUnicoEscaneo);
             localStorage.setItem('escaneadosHoyPAE', JSON.stringify(listaEscaneados));
 
-            resultContainer.className = "alert alert-success text-center text-dark font-inter fw-bold xsmall mb-0";
-            resultContainer.innerHTML = `✅ ACCESO CONCEDIDO: ${nombreUsuario}`;
+            mostrarPopupEscaneo('exito', `Acceso concedido para <strong>${nombreUsuario}</strong>.`, DURACION_ALERTA_MS);
 
             let entregados = parseInt(localStorage.getItem('entregadosPAE') || '0');
             let total = parseInt(localStorage.getItem('racionesPAE') || '0');
@@ -367,9 +428,8 @@ function iniciarCamaraQR() {
             }
 
             setTimeout(() => {
-                resultContainer.style.display = 'none';
                 escaneoEnPausa = false;
-            }, 1500);
+            }, DURACION_ALERTA_MS);
 
         }, (errorMessage) => {});
     }
@@ -401,7 +461,7 @@ async function intentarReservar() {
         const rolLower = (usuario.rol || '').toLowerCase();
 
         if (rolLower.includes('admin') || rolLower.includes('supervisor') || rolLower.includes('director')) {
-            await mostrarAlertaEstetica('Acceso No Requerido', 'Tu perfil no requiere realizar reserva de almuerzo.', 'ℹ️');
+            await mostrarAlertaEstetica('Acceso No Requerido', 'Tu perfil no requiere realizar reserva de almuerzo.', 'Aceptar', 'ℹ️');
             return;
         }
 
@@ -412,7 +472,7 @@ async function intentarReservar() {
         const tarjetaQR = document.getElementById('tarjeta-qr-usuario');
 
         if (reservasHechas[rutUser]) {
-            await mostrarAlertaEstetica('Reserva Ya Realizada', `¡Hola ${usuario.nombre}! Ya reservaste tu almuerzo. Tu código QR se encuentra disponible en pantalla.`, '🍱');
+            await mostrarAlertaEstetica('Reserva Ya Realizada', `¡Hola <strong>${usuario.nombre}</strong>! Ya reservaste tu almuerzo. Tu código QR se encuentra disponible en pantalla.`, 'Aceptar', '🍱');
         } else {
             reservasHechas[rutUser] = true;
             localStorage.setItem('reservasUsuariosPAE', JSON.stringify(reservasHechas));
@@ -429,7 +489,7 @@ async function intentarReservar() {
                 generarCodigoQR(usuario);
             }
 
-            await mostrarAlertaEstetica('¡Reserva Confirmada!', `🎉 ¡Excelente, ${usuario.nombre}! Tu cupo ha sido reservado con éxito.`, '✅');
+            await mostrarAlertaEstetica('Reserva Confirmada', `¡Excelente, <strong>${usuario.nombre}</strong>! Tu cupo ha sido reservado con éxito.`, 'Aceptar', '✅');
         }
     }
 }
@@ -450,46 +510,12 @@ async function reiniciarRacionesConClave() {
 
         actualizarContadorRaciones();
 
-        await mostrarAlertaEstetica('Reinicio Completado', 'Las raciones y reservas del día han sido reiniciadas a cero.', '🔄');
+        await mostrarAlertaEstetica('Reinicio Completado', 'Las raciones y reservas del día han sido reiniciadas a cero.', 'Aceptar', '🔄');
     } else {
-        await mostrarAlertaEstetica('Clave Incorrecta', 'No tienes permisos de autorización para realizar esta acción.', '❌');
+        await mostrarAlertaEstetica('Clave Incorrecta', 'No tienes permisos de autorización para realizar esta acción.', 'Aceptar', '❌');
     }
 }
 
-
-
-
-
-
-/* Cambios de prueba */
-
-// --- SISTEMA DE ALERTAS ESTÉTICAS CENTRADAS ---
-function mostrarAlertaEstetica(titulo, mensaje, icono = '🔔') {
-    return new Promise((resolve) => {
-        const overlay = document.createElement('div');
-        overlay.className = 'custom-alert-overlay';
-        
-        overlay.innerHTML = `
-            <div class="custom-alert-box">
-                <div class="custom-alert-icon">${icono}</div>
-                <div class="custom-alert-title text-white">${titulo}</div>
-                <div class="custom-alert-message">${mensaje}</div>
-                <button id="btn-cerrar-alerta" class="btn btn-custom-primary w-100 py-2 font-poppins fw-bold glow-btn">
-                    Aceptar
-                </button>
-            </div>
-        `;
-
-        document.body.appendChild(overlay);
-
-        document.getElementById('btn-cerrar-alerta').addEventListener('click', () => {
-            overlay.remove();
-            resolve();
-        });
-    });
-}
-
-// --- PROMPT PERSONALIZADO PARA CLAVE DE REINICIO ---
 function mostrarPromptEstetico(titulo, mensaje) {
     return new Promise((resolve) => {
         const overlay = document.createElement('div');
@@ -497,13 +523,13 @@ function mostrarPromptEstetico(titulo, mensaje) {
 
         overlay.innerHTML = `
             <div class="custom-alert-box">
-                <div class="custom-alert-icon">🔒</div>
-                <div class="custom-alert-title text-white">${titulo}</div>
-                <div class="custom-alert-message">${mensaje}</div>
-                <input type="password" id="input-prompt-clave" class="form-control custom-input mb-3 text-center" placeholder="••••" maxlength="10">
+                <div class="custom-alert-shield-icon">🔒</div>
+                <div class="custom-alert-title text-white fw-bold mb-2">${titulo}</div>
+                <div class="custom-alert-message mb-3 text-light">${mensaje}</div>
+                <input type="password" id="input-prompt-clave" class="form-control text-center mb-3 bg-dark text-white border-secondary" placeholder="••••" maxlength="10" style="border-radius: 10px;">
                 <div class="d-flex gap-2">
-                    <button id="btn-cancelar-prompt" class="btn btn-custom-outline w-50 py-2 font-poppins fw-bold xsmall">Cancelar</button>
-                    <button id="btn-aceptar-prompt" class="btn btn-custom-primary w-50 py-2 font-poppins fw-bold glow-btn xsmall">Confirmar</button>
+                    <button id="btn-cancelar-prompt" class="btn btn-outline-light w-50 py-2 fw-bold" style="border-radius: 10px;">Cancelar</button>
+                    <button id="btn-aceptar-prompt" class="btn btn-success w-50 py-2 fw-bold" style="border-radius: 10px;">Confirmar</button>
                 </div>
             </div>
         `;
@@ -526,52 +552,9 @@ function mostrarPromptEstetico(titulo, mensaje) {
     });
 }
 
-// --- ALERTA CENTRADA ESTILO JUNAWEB ---
-function mostrarAlertaEstetica(titulo, mensaje, textoBoton = "CERRAR Y VER QR") {
+// ALERTA EMERGENTE EN CENTRO DE PANTALLA
+function mostrarAlertaEstetica(titulo, mensaje, textoBoton = "Aceptar", icono = "🛡️") {
     return new Promise((resolve) => {
-        // Eliminar cualquier alerta existente
-        const alertaExistente = document.querySelector('.custom-alert-overlay');
-        if (alertaExistente) alertaExistente.remove();
-
-        const overlay = document.createElement('div');
-        overlay.className = 'custom-alert-overlay';
-        
-        overlay.innerHTML = `
-            <div class="custom-alert-box">
-                <div class="custom-alert-shield-icon">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                        <path d="M9 12l2 2 4-4"></path>
-                    </svg>
-                </div>
-                <h3 class="custom-alert-title">${titulo}</h3>
-                <p class="custom-alert-message">${mensaje}</p>
-                <button id="btn-cerrar-alerta" class="btn-alert-confirm">
-                    ${textoBoton}
-                </button>
-            </div>
-        `;
-
-        document.body.appendChild(overlay);
-
-        document.getElementById('btn-cerrar-alerta').addEventListener('click', () => {
-            overlay.remove();
-            resolve();
-        });
-    });
-}
-
-async function confirmarReservaEjemplo() {
-    await mostrarAlertaEstetica(
-        "Reserva Confirmada",
-        "Tu cupo para el Programa de Alimentación Escolar (PAE) ha sido reservado con éxito para el turno de hoy.",
-        "CERRAR Y VER QR"
-    );
-}
-
-function mostrarAlertaEstetica(titulo, mensaje, textoBoton = "Aceptar") {
-    return new Promise((resolve) => {
-        // Eliminar alerta previa si existe
         const antigua = document.getElementById('junaweb-modal-alerta');
         if (antigua) antigua.remove();
 
@@ -581,25 +564,58 @@ function mostrarAlertaEstetica(titulo, mensaje, textoBoton = "Aceptar") {
         
         overlay.innerHTML = `
             <div class="custom-alert-box">
-                <div class="custom-alert-shield-icon">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                        <path d="M9 12l2 2 4-4"></path>
-                    </svg>
-                </div>
-                <h3 class="custom-alert-title">${titulo}</h3>
-                <p class="custom-alert-message">${mensaje}</p>
-                <button id="btn-cerrar-alerta" class="btn-alert-confirm">${textoBoton}</button>
+                <div class="custom-alert-shield-icon">${icono}</div>
+                <h3 class="custom-alert-title text-white fw-bold h4 mb-2">${titulo}</h3>
+                <p class="custom-alert-message text-light mb-4" style="opacity: 0.9; font-size: 0.95rem;">${mensaje}</p>
+                <button id="btn-cerrar-alerta" class="btn btn-success w-100 py-2.5 fw-bold" style="border-radius: 12px; font-size: 0.9rem;">${textoBoton}</button>
             </div>
         `;
 
         document.body.appendChild(overlay);
-        document.body.classList.add('modal-open');
 
         document.getElementById('btn-cerrar-alerta').onclick = () => {
             overlay.remove();
-            document.body.classList.remove('modal-open');
             resolve();
         };
     });
+}
+
+// POPUP EMERGENTE TEMPORIZADO PARA ESCANEO DE QR
+function mostrarPopupEscaneo(estado, mensajeHTML, duracionMs = 2500) {
+    const previo = document.getElementById('junaweb-popup-escaneo');
+    if (previo) previo.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'junaweb-popup-escaneo';
+    overlay.className = 'custom-popup-overlay';
+
+    const CONFIGS = {
+        exito: { color: '#10b981', border: '#059669', bg: 'rgba(16, 185, 129, 0.2)', titulo: '✅ ACCESO CONCEDIDO' },
+        alerta: { color: '#f59e0b', border: '#d97706', bg: 'rgba(245, 158, 11, 0.2)', titulo: '⚠️ PASE YA REGISTRADO' },
+        invalido: { color: '#ef4444', border: '#dc2626', bg: 'rgba(239, 68, 68, 0.2)', titulo: '❌ CÓDIGO INVÁLIDO' }
+    };
+
+    const cfg = CONFIGS[estado] || CONFIGS.exito;
+
+    overlay.innerHTML = `
+        <div class="custom-popup-box" style="border-color: ${cfg.border}; border: 1px solid ${cfg.border};">
+            <div class="custom-popup-badge" style="background: ${cfg.bg}; color: ${cfg.color}; border: 1px solid ${cfg.border};">
+                ${cfg.titulo}
+            </div>
+            <div class="custom-popup-body text-white mt-3 fs-6">
+                ${mensajeHTML}
+            </div>
+            <div class="custom-popup-progress">
+                <div class="custom-popup-bar" style="background: ${cfg.color}; animation-duration: ${duracionMs}ms;"></div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    setTimeout(() => {
+        if (overlay.parentNode) {
+            overlay.remove();
+        }
+    }, duracionMs);
 }

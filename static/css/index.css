@@ -369,171 +369,6 @@ img, .card {
 /* =========================================
    MODAL DE ALERTAS & PROMPT PERSONALIZADO
    ========================================= */
-.custom-alert-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(4, 8, 12, 0.75);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    opacity: 0;
-    animation: fadeInModal 0.25s forwards ease-out;
-}
-
-.custom-alert-box {
-    background: rgba(18, 29, 43, 0.95);
-    border: 1px solid rgba(0, 210, 122, 0.3);
-    border-radius: 20px;
-    padding: 24px 28px;
-    max-width: 420px;
-    width: 90%;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 210, 122, 0.15);
-    text-align: center;
-    color: #ffffff;
-    transform: scale(0.9);
-    animation: scaleUpModal 0.25s forwards ease-out;
-}
-
-.custom-alert-icon {
-    font-size: 2.2rem;
-    margin-bottom: 12px;
-}
-
-.custom-alert-title {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-    font-size: 1.25rem;
-    margin-bottom: 8px;
-}
-
-.custom-alert-message {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
-    color: #94a3b8;
-    margin-bottom: 20px;
-    line-height: 1.4;
-}
-
-@keyframes fadeInModal {
-    to { opacity: 1; }
-}
-
-@keyframes scaleUpModal {
-    to { transform: scale(1); }
-}
-
-
-/* ===================================================
-   MODAL DE ALERTA CENTRADO (JUNAWEB GLASSMORPHISM)
-   =================================================== */
-
-/* Fondo oscuro translúcido con desenfoque que cubre toda la pantalla */
-.custom-alert-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(4, 8, 14, 0.78);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    z-index: 99999;
-    opacity: 0;
-    animation: fadeInModal 0.2s forwards ease-out;
-}
-
-/* Tarjeta contenedora centrada al medio */
-.custom-alert-box {
-    background: rgba(18, 30, 46, 0.95);
-    border: 1.5px solid rgba(0, 210, 122, 0.4);
-    border-radius: 20px;
-    padding: 36px 30px 30px 30px;
-    max-width: 440px;
-    width: 90%;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 210, 122, 0.15);
-    text-align: center;
-    color: #ffffff;
-    transform: scale(0.85);
-    animation: scaleUpModal 0.25s forwards ease-out;
-}
-
-/* Ícono de escudo con check verde */
-.custom-alert-shield-icon {
-    width: 64px;
-    height: 64px;
-    margin: 0 auto 20px auto;
-    border-radius: 50%;
-    background: rgba(0, 210, 122, 0.12);
-    border: 1px solid rgba(0, 210, 122, 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.custom-alert-shield-icon svg {
-    width: 34px;
-    height: 34px;
-    stroke: #00d27a;
-    stroke-width: 2.2;
-    fill: none;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-
-/* Título principal */
-.custom-alert-title {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-    font-size: 1.5rem;
-    color: #ffffff;
-    margin-bottom: 12px;
-    letter-spacing: -0.3px;
-}
-
-/* Mensaje del cuerpo */
-.custom-alert-message {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.92rem;
-    color: #a0aec0;
-    line-height: 1.5;
-    margin-bottom: 28px;
-    padding: 0 10px;
-}
-
-/* Botón estilizado verde neón */
-.btn-alert-confirm {
-    width: 100%;
-    padding: 14px 0;
-    background: rgba(0, 210, 122, 0.12);
-    border: 1.5px solid #00d27a;
-    border-radius: 12px;
-    color: #ffffff;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.88rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 0 15px rgba(0, 210, 122, 0.2);
-}
-
-.btn-alert-confirm:hover {
-    background: #00d27a;
-    color: #0b131e;
-    box-shadow: 0 0 25px rgba(0, 210, 122, 0.5);
-}
-
-/* Animaciones */
 @keyframes fadeInModal {
     to { opacity: 1; }
 }
@@ -595,6 +430,8 @@ body.modal-open {
     stroke: #00d27a;
     stroke-width: 2.5;
     fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 .custom-alert-title {
@@ -632,4 +469,112 @@ body.modal-open {
 .btn-alert-confirm:hover {
     background: #00d27a !important;
     color: #000000 !important;
+}
+
+/* =========================================
+   VARIANTES DE COLOR - POPUP DE ESCANEO QR
+   ========================================= */
+
+/* Éxito (verde) - Acceso concedido */
+.custom-alert-box.popup-exito {
+    border-color: #00d27a !important;
+    box-shadow: 0 0 40px rgba(0, 210, 122, 0.25) !important;
+}
+.custom-alert-box.popup-exito .custom-alert-shield-icon {
+    background: rgba(0, 210, 122, 0.15);
+    border-color: #00d27a;
+}
+.custom-alert-box.popup-exito .custom-alert-shield-icon svg {
+    stroke: #00d27a;
+}
+
+/* Alerta (rojo) - Pase ya registrado */
+.custom-alert-box.popup-alerta {
+    border-color: #ff4d4d !important;
+    box-shadow: 0 0 40px rgba(255, 77, 77, 0.25) !important;
+}
+.custom-alert-box.popup-alerta .custom-alert-shield-icon {
+    background: rgba(255, 77, 77, 0.15);
+    border-color: #ff4d4d;
+}
+.custom-alert-box.popup-alerta .custom-alert-shield-icon svg {
+    stroke: #ff4d4d;
+}
+
+/* Inválido (naranja) - Código QR con formato inválido */
+.custom-alert-box.popup-invalido {
+    border-color: #f5a623 !important;
+    box-shadow: 0 0 40px rgba(245, 166, 35, 0.25) !important;
+}
+.custom-alert-box.popup-invalido .custom-alert-shield-icon {
+    background: rgba(245, 166, 35, 0.15);
+    border-color: #f5a623;
+}
+.custom-alert-box.popup-invalido .custom-alert-shield-icon svg {
+    stroke: #f5a623;
+}
+
+
+
+
+
+
+/* Overlay de Alerta Flotante en Pantalla */
+.custom-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+    animation: fadeIn 0.25s ease-out;
+}
+
+.custom-popup-box {
+    width: 90%;
+    max-width: 420px;
+    padding: 24px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    border: 2px solid transparent;
+}
+
+.custom-popup-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+.custom-popup-progress {
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    margin-top: 18px;
+    overflow: hidden;
+}
+
+.custom-popup-bar {
+    height: 100%;
+    width: 100%;
+    animation: shrinkProgress linear forwards;
+}
+
+@keyframes shrinkProgress {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
 }
