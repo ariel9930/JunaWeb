@@ -1,23 +1,23 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Carga obligatoria de las 3 cuentas predeterminadas
+
     cargarCuentasPredeterminadas();
 
     const loginRut = document.getElementById("login-rut");
     if (loginRut) {
-        // Escucha mientras el usuario escribe para autorellenar la ficha
+
         loginRut.addEventListener("input", (e) => {
             e.target.value = e.target.value.replace(/[^0-9kK\.\,-]/g, '');
             buscarYMostrarFicha(e.target.value);
         });
 
-        // Si el campo ya tiene texto al cargar (por ejemplo si el navegador autocompleta)
+
         if (loginRut.value) {
             buscarYMostrarFicha(loginRut.value);
         }
     }
 });
 
-// Carga directa de las 3 cuentas exigidas (Contraseñas estandarizadas a "1234")
+
 function cargarCuentasPredeterminadas() {
     const cuentasBase = [
         {
@@ -48,20 +48,19 @@ function cargarCuentasPredeterminadas() {
 
     let usuariosGuardados = JSON.parse(localStorage.getItem("junaweb_usuarios")) || [];
 
-    // Fusionar o reescribir las cuentas base para asegurar que siempre estén sincronizadas
+
     cuentasBase.forEach(cuentaBase => {
         const existeIndex = usuariosGuardados.findIndex(u => u.rutLimpio === cuentaBase.rutLimpio);
         if (existeIndex !== -1) {
-            usuariosGuardados[existeIndex] = cuentaBase; // Actualiza si ya existía
+            usuariosGuardados[existeIndex] = cuentaBase;
         } else {
-            usuariosGuardados.push(cuentaBase); // Agrega si no estaba
+            usuariosGuardados.push(cuentaBase);
         }
     });
 
     localStorage.setItem("junaweb_usuarios", JSON.stringify(usuariosGuardados));
 }
 
-// Busca y rellena la Ficha de Identificación en pantalla
 function buscarYMostrarFicha(rutTexto) {
     const rutLimpio = rutTexto.replace(/[^0-9kK]/g, '').toUpperCase();
     const usuarios = JSON.parse(localStorage.getItem("junaweb_usuarios")) || [];
@@ -86,7 +85,7 @@ function buscarYMostrarFicha(rutTexto) {
     }
 }
 
-// Procesa el inicio de sesión
+
 function procesarLogin(event) {
     event.preventDefault();
 
@@ -102,7 +101,6 @@ function procesarLogin(event) {
     if (usuarioValido) {
         mostrarAlerta(alertBox, `¡Bienvenido/a, ${usuarioValido.nombre}!`, "alert-success");
 
-        // Guardar la sesión en ambas claves para asegurar compatibilidad total
         localStorage.setItem("junaweb_sesion_activa", JSON.stringify(usuarioValido));
         localStorage.setItem("usuarioJunaWeb", JSON.stringify(usuarioValido));
 

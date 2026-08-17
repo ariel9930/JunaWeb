@@ -7,44 +7,43 @@
     <meta name="author" content="Ariel Faundez, Agustin sanchez, Dante Canales, Diego Valenzuela y Benjamin Carrasco">
     <title>JunaWeb - Sistema PAE Digital</title>
 
-    <!-- Google Fonts -->
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap"
         rel="stylesheet">
 
-    <!-- Bootstrap 5 CSS -->
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="static/css/iniciar_sesion.css">
 
-    <!-- Librerías de QR (HTML5 Scanner y QR Generator) -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 
 <body class="dark-theme d-flex flex-column min-vh-100">
 
-<!-- HEADER DE BORDE A BORDE (WIDTH: 100%) -->
-<header class="glass-header sticky-top w-100 p-0 m-0">
-    <div class="container-fluid d-flex justify-content-between align-items-center py-2 px-3 px-sm-4">
-        <a href="index.html" class="d-flex align-items-center text-decoration-none">
-            <img src="static/images/logo.png" alt="Logo JunaWeb" class="header-logo">
-            <span class="font-poppins fw-bold logo-text ms-2">
-                <span class="text-white">Juna</span><span class="text-accent">Web</span>
-            </span>
-        </a>
-        <div class="d-flex align-items-center gap-2" id="header-buttons">
-            <a href="page/iniciar_sesion.html" class="btn btn-custom-outline btn-sm">Iniciar Sesión</a>
-            <a href="page/registro.html" class="btn btn-custom-primary btn-sm">Registrarse</a>
+
+    <header class="glass-header sticky-top w-100 p-0 m-0">
+        <div class="container-fluid d-flex justify-content-between align-items-center py-2 px-3 px-sm-4">
+            <a href="index.html" class="d-flex align-items-center text-decoration-none">
+                <img src="static/images/logo.png" alt="Logo JunaWeb" class="header-logo">
+                <span class="font-poppins fw-bold logo-text ms-2">
+                    <span class="text-white">Juna</span><span class="text-accent">Web</span>
+                </span>
+            </a>
+            <div class="d-flex align-items-center gap-2" id="header-buttons">
+                <a href="page/iniciar_sesion.html" class="btn btn-custom-outline btn-sm">Iniciar Sesión</a>
+                <a href="page/registro.html" class="btn btn-custom-primary btn-sm">Registrarse</a>
+            </div>
         </div>
-    </div>
-</header>
+    </header>
 
     <main class="container d-flex flex-grow-1 align-items-center py-5">
         <div class="row w-100 align-items-center justify-content-between g-5">
 
-            <!-- Columna Izquierda: Información Principal -->
+
             <div class="col-12 col-lg-6">
                 <h1 class="display-4 font-poppins fw-bold text-white mb-3">
                     El comedor escolar <span class="text-accent">sin filas</span>, sin suplantaciones.
@@ -54,7 +53,7 @@
                     código QR. Más justo, más rápido y completamente automático.
                 </p>
 
-                <!-- Tarjeta de Perfil Resumen (Solo visible al iniciar sesión) -->
+            
                 <div id="perfil-usuario-main" class="custom-card p-3 mb-4 d-none border-accent-glow">
                     <div class="d-flex align-items-center justify-content-between">
                         <div class="d-flex align-items-center gap-3">
@@ -86,10 +85,10 @@
                 </div>
             </div>
 
-            <!-- Columna Derecha: Tarjetas Dinámicas -->
+
             <div class="col-12 col-lg-5">
 
-                <!-- 1. VISTA PREVIA (Para visitantes sin sesión iniciada) -->
+
                 <div id="preview-visita" class="custom-card p-4 text-center card-hover shadow-lg">
                     <div class="py-2">
                         <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#00d27a"
@@ -139,7 +138,7 @@
                     </div>
                 </div>
 
-                <!-- 2. TARJETA PASE QR (Aparece únicamente cuando el Estudiante presiona "Reservar mi almuerzo") -->
+
                 <div id="tarjeta-qr-usuario" class="custom-card p-4 card-hover shadow-lg border-accent-glow d-none">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
@@ -150,13 +149,12 @@
                         <div id="qr-avatar-usuario" class="badge-custom rounded-circle fs-5 p-2">--</div>
                     </div>
 
-                    <!-- Contenedor donde se dibuja dinámicamente el código QR al reservar -->
                     <div class="p-4 text-center my-3 rounded-3 bg-white border border-secondary d-flex justify-content-center align-items-center"
                         style="min-height: 200px;">
                         <div id="qr-code-placeholder"></div>
                     </div>
 
-                    <!-- BOTÓN PARA AGRANDAR QR -->
+
                     <button type="button" class="btn btn-sm btn-custom-outline w-100 mb-3 font-inter fw-bold"
                         onclick="abrirModalQR()">
                         Agrandar Código QR
@@ -168,7 +166,6 @@
                     </div>
                 </div>
 
-                <!-- 3. LECTOR QR EN VIVO (Aparece si inicia sesión el Supervisor) -->
                 <div id="tarjeta-supervisor-camara"
                     class="custom-card p-4 card-hover shadow-lg border-accent-glow d-none">
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -189,7 +186,6 @@
                     </div>
                 </div>
 
-                <!-- 4. PANEL COCINA/DIRECCIÓN (Aparece si inicia sesión la Directora/Cocina) -->
                 <div id="tarjeta-direccion-pae" class="custom-card p-4 card-hover shadow-lg border-accent-glow d-none">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
@@ -197,7 +193,7 @@
                                 Dirección</span>
                             <h4 class="text-white font-poppins fw-bold mb-0">Raciones del Día</h4>
                         </div>
-                        <!-- BOTÓN REINICIAR -->
+                    
                         <button class="btn btn-outline-danger btn-sm font-inter" onclick="reiniciarRacionesConClave()">
                             Reiniciar
                         </button>
@@ -240,7 +236,7 @@
         </div>
     </main>
 
-    <!-- MODAL PARA MOSTRAR QR EN TAMAÑO GRANDE -->
+
     <div class="modal fade" id="modalQR" tabindex="-1" aria-labelledby="modalQRLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark border border-secondary text-white text-center">

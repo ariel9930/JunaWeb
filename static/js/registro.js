@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // Inicializar cuentas por defecto si el localStorage está vacío
     inicializarCuentasBase();
 
     const regRut = document.getElementById("reg-rut");
@@ -10,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Cuentas por defecto del sistema JunaWeb
+
 function inicializarCuentasBase() {
     let usuarios = JSON.parse(localStorage.getItem("junaweb_usuarios"));
     if (!usuarios || usuarios.length === 0) {

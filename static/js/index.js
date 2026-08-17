@@ -3,10 +3,9 @@ let modalQRInstance = null;
 let escaneoEnPausa = false;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Inyectar estilos visuales universales para todas las alertas flotantes
+
     inyectarEstilosPopup();
 
-    // Verificar si ya pasaron 20 horas para reiniciar todos los contadores a 0
     verificarCiclo20Horas();
 
     if (!localStorage.getItem('racionesPAE')) {
@@ -21,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     verificarEstadoSesion();
 });
 
-// APAGADO AUTOMÁTICO DE CÁMARA AL CERRAR O NAVEGAR FUERA DE LA PÁGINA
+
 window.addEventListener('beforeunload', () => {
     if (html5QrcodeScanner) {
         try {
@@ -32,7 +31,6 @@ window.addEventListener('beforeunload', () => {
     }
 });
 
-// INYECCIÓN DINÁMICA DE ESTILOS CSS PARA MODALES Y ALERTAS FLOTANTES EN EL CENTRO
 function inyectarEstilosPopup() {
     if (document.getElementById('css-popups-junaweb')) return;
     const style = document.createElement('style');
@@ -104,7 +102,6 @@ function inyectarEstilosPopup() {
     document.head.appendChild(style);
 }
 
-// GENERADOR DE SONIDOS DE VALIDACIÓN
 function emitirSonido(tipo) {
     try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -153,7 +150,7 @@ function emitirSonido(tipo) {
     }
 }
 
-// REINICIO CADA 20 HORAS
+// REINICIO DE CONTADORES CADA 20 HORAS
 function verificarCiclo20Horas() {
     const tiempo20HorasMS = 20 * 60 * 60 * 1000;
     const ahora = Date.now();
@@ -168,6 +165,7 @@ function verificarCiclo20Horas() {
     }
 }
 
+// CALCULA EL BLOQUE ACTUAL DE 5 HORAS
 function obtenerBloqueHorario() {
     const ahora = new Date();
     const fecha = ahora.toISOString().split('T')[0];
@@ -279,8 +277,24 @@ function generarCodigoQR(usuario) {
     qrContainer.innerHTML = "";
 
     const rutText = usuario.rutLimpio || usuario.rut || "SIN-RUT";
-    const bloque = obtenerBloqueHorario();
-    const payloadQR = `PAE-PASE:${rutText}:${usuario.nombre}:${bloque}`;
+    const bloqueActual = obtenerBloqueHorario();
+    const idUnicoEscaneo = `${rutText}_${bloqueActual}`;
+    
+    let escaneados = JSON.parse(localStorage.getItem('escaneadosHoyPAE') || '[]');
+
+    // Si ya se escaneó en este bloque de 5 horas, mostrar mensaje
+    if (escaneados.includes(idUnicoEscaneo)) {
+        qrContainer.innerHTML = `
+            <div class="text-center p-3" style="background: rgba(239, 68, 68, 0.1); border: 1px dashed #ef4444; border-radius: 12px;">
+                <div style="font-size: 2rem;">✅</div>
+                <div class="fw-bold text-danger mt-1" style="font-size: 0.85rem;">CÓDIGO UTILIZADO</div>
+                <small class="text-muted" style="font-size: 0.75rem;">Ración entregada para este turno</small>
+            </div>
+        `;
+        return;
+    }
+
+    const payloadQR = `PAE-PASE:${rutText}:${usuario.nombre}:${bloqueActual}`;
 
     try {
         if (typeof QRCode !== 'undefined') {
@@ -314,22 +328,36 @@ function abrirModalQR() {
     if (containerModalQR) {
         containerModalQR.innerHTML = "";
         const rutText = usuario.rutLimpio || usuario.rut || "SIN-RUT";
-        const bloque = obtenerBloqueHorario();
-        const payloadQR = `PAE-PASE:${rutText}:${usuario.nombre}:${bloque}`;
+        const bloqueActual = obtenerBloqueHorario();
+        const idUnicoEscaneo = `${rutText}_${bloqueActual}`;
 
-        try {
-            if (typeof QRCode !== 'undefined') {
-                new QRCode(containerModalQR, {
-                    text: payloadQR,
-                    width: 250,
-                    height: 250,
-                    colorDark: "#000000",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H
-                });
+        let escaneados = JSON.parse(localStorage.getItem('escaneadosHoyPAE') || '[]');
+
+        if (escaneados.includes(idUnicoEscaneo)) {
+            containerModalQR.innerHTML = `
+                <div class="text-center p-4">
+                    <div style="font-size: 3rem;">🚫</div>
+                    <h5 class="text-danger fw-bold mt-2">CÓDIGO USADO</h5>
+                    <p class="text-muted small">Este pase de alimentación ya fue canjeado en este turno.</p>
+                </div>
+            `;
+        } else {
+            const payloadQR = `PAE-PASE:${rutText}:${usuario.nombre}:${bloqueActual}`;
+
+            try {
+                if (typeof QRCode !== 'undefined') {
+                    new QRCode(containerModalQR, {
+                        text: payloadQR,
+                        width: 250,
+                        height: 250,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                }
+            } catch (e) {
+                console.error(e);
             }
-        } catch (e) {
-            console.error(e);
         }
     }
 
@@ -358,7 +386,7 @@ function actualizarContadorRaciones() {
     }
 }
 
-// INICIO Y LOGICA CONTINUA DEL LECTOR QR
+
 function iniciarCamaraQR() {
     if (html5QrcodeScanner) return;
 
@@ -389,9 +417,10 @@ function iniciarCamaraQR() {
             const DURACION_ALERTA_MS = 2500;
             const partes = decodedText.split(':');
 
+            // 1. Validar formato básico del payload
             if (partes.length < 4 || partes[0] !== 'PAE-PASE') {
                 emitirSonido('alerta');
-                mostrarPopupEscaneo('invalido', 'Código QR no válido o desactualizado.', DURACION_ALERTA_MS);
+                mostrarPopupEscaneo('invalido', 'Código QR no reconocido o corrupto.', DURACION_ALERTA_MS);
 
                 setTimeout(() => { escaneoEnPausa = false; }, DURACION_ALERTA_MS);
                 return;
@@ -400,18 +429,30 @@ function iniciarCamaraQR() {
             const rutUser = partes[1];
             const nombreUsuario = partes[2];
             const bloqueQR = partes[3];
+            const bloqueActual = obtenerBloqueHorario();
 
-            const idUnicoEscaneo = `${rutUser}_${bloqueQR}`;
-            let listaEscaneados = JSON.parse(localStorage.getItem('escaneadosHoyPAE') || '[]');
-
-            if (listaEscaneados.includes(idUnicoEscaneo)) {
+            // 2. VALIDACIÓN DE EXPIRACIÓN: Comparar bloque del QR vs bloque de la hora actual
+            if (bloqueQR !== bloqueActual) {
                 emitirSonido('alerta');
-                mostrarPopupEscaneo('alerta', `El pase de <strong>${nombreUsuario}</strong> ya fue registrado para este turno.`, DURACION_ALERTA_MS);
+                mostrarPopupEscaneo('invalido', `El código QR de <strong>${nombreUsuario}</strong> ha caducado (Pertenece a un turno anterior).`, DURACION_ALERTA_MS);
 
                 setTimeout(() => { escaneoEnPausa = false; }, DURACION_ALERTA_MS);
                 return;
             }
 
+            // 3. VALIDACIÓN DE REUSO: Identificador compuesto por RUT + Bloque actual
+            const idUnicoEscaneo = `${rutUser}_${bloqueActual}`;
+            let listaEscaneados = JSON.parse(localStorage.getItem('escaneadosHoyPAE') || '[]');
+
+            if (listaEscaneados.includes(idUnicoEscaneo)) {
+                emitirSonido('alerta');
+                mostrarPopupEscaneo('alerta', `El pase de <strong>${nombreUsuario}</strong> ya fue registrado para este turno de 5 horas.`, DURACION_ALERTA_MS);
+
+                setTimeout(() => { escaneoEnPausa = false; }, DURACION_ALERTA_MS);
+                return;
+            }
+
+            // 4. REGISTRO Y CONCESIÓN DE ACCESO
             emitirSonido('exito');
             listaEscaneados.push(idUnicoEscaneo);
             localStorage.setItem('escaneadosHoyPAE', JSON.stringify(listaEscaneados));
@@ -552,7 +593,7 @@ function mostrarPromptEstetico(titulo, mensaje) {
     });
 }
 
-// ALERTA EMERGENTE EN CENTRO DE PANTALLA
+
 function mostrarAlertaEstetica(titulo, mensaje, textoBoton = "Aceptar", icono = "🛡️") {
     return new Promise((resolve) => {
         const antigua = document.getElementById('junaweb-modal-alerta');
@@ -580,7 +621,7 @@ function mostrarAlertaEstetica(titulo, mensaje, textoBoton = "Aceptar", icono = 
     });
 }
 
-// POPUP EMERGENTE TEMPORIZADO PARA ESCANEO DE QR
+
 function mostrarPopupEscaneo(estado, mensajeHTML, duracionMs = 2500) {
     const previo = document.getElementById('junaweb-popup-escaneo');
     if (previo) previo.remove();

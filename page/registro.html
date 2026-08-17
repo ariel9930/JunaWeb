@@ -7,14 +7,14 @@
     <title>JunaWeb - Registro</title>
     <meta name="author" content="Ariel Faundez, Agustin sanchez, Dante Canales, Diego Valenzuela y Benjamin Carrasco">
 
-    <!-- Google Fonts -->
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap"
         rel="stylesheet">
 
-    <!-- Bootstrap 5 CSS -->
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../static/css/registro.css">
 </head>
@@ -22,7 +22,7 @@
 <body class="dark-theme d-flex flex-column min-vh-100 justify-content-center align-items-center py-4">
 
     <div class="register-container w-100 px-3" style="max-width: 550px;">
-        <!-- Logo y Cabecera -->
+    
         <div class="text-center mb-4">
             <a href="../index.html" class="d-inline-flex align-items-center text-decoration-none mb-2">
                 <img src="../static/images/logo.png" alt="Logo JunaWeb" class="header-logo" style="height: 40px;">
@@ -34,12 +34,12 @@
             <p class="text-bright-sub font-inter xsmall">Crea tu cuenta para el sistema PAE</p>
         </div>
 
-        <!-- Tarjeta de Formulario -->
+        
         <div class="custom-card p-4 shadow-lg border-accent-glow">
             <div id="register-alert" class="alert d-none py-2 mb-3 font-inter xsmall text-center"></div>
 
             <form id="form-registro" onsubmit="procesarRegistro(event)">
-                <!-- NOMBRE COMPLETO -->
+                
                 <div class="mb-3 text-start">
                     <label for="reg-nombre" class="form-label text-bright-sub font-inter xsmall fw-bold">NOMBRE
                         COMPLETO</label>
@@ -47,7 +47,7 @@
                         placeholder="Ej: Juan Pérez" required>
                 </div>
 
-                <!-- RUT -->
+                
                 <div class="mb-3 text-start">
                     <label for="reg-rut" class="form-label text-bright-sub font-inter xsmall fw-bold">RUT</label>
                     <input type="text" class="form-control custom-input font-inter" id="reg-rut"
@@ -55,7 +55,7 @@
                         oninput="this.value = this.value.replace(/[^0-9kK\.\,-]/g, '')" required>
                 </div>
 
-                <!-- CURSO / ÁREA -->
+                
                 <div class="mb-3 text-start">
                     <label for="reg-curso" class="form-label text-bright-sub font-inter xsmall fw-bold">CURSO /
                         ÁREA</label>
@@ -63,7 +63,7 @@
                         placeholder="Ej: 4° Medio A" required>
                 </div>
 
-                <!-- CONTRASEÑA -->
+                
                 <div class="mb-4 text-start">
                     <label for="reg-password"
                         class="form-label text-bright-sub font-inter xsmall fw-bold">CONTRASEÑA</label>
@@ -71,7 +71,7 @@
                         placeholder="••••" minlength="4" required>
                 </div>
 
-                <!-- BOTÓN REGISTRARSE -->
+                
                 <button type="submit" class="btn btn-custom-primary w-100 py-2 font-poppins fw-bold glow-btn mb-3">
                     CREAR CUENTA →
                 </button>
@@ -84,7 +84,6 @@
                     aquí</a>
             </div>
 
-            <!-- BOTÓN VOLVER AL INICIO -->
             <div class="text-center pt-2 border-top border-secondary border-opacity-25">
                 <a href="../index.html"
                     class="btn btn-custom-outline w-100 py-2 font-poppins xsmall fw-bold text-decoration-none">
